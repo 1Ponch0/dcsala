@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Darts Club Šaľa</title>
+  <meta name="description" content="Štatistiky hráčov Darts Club Šaľa">
+  <meta name="theme-color" content="#0b0f14">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DC Šaľa">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #0b0f14;
+      --bg2: #0f1722;
+      --ink: #f2f2f2;
+      --muted: #aab1ba;
+      --accentL: #e7e7e7;
+      --accentR: #d1003a;
+      --card: #0f1722;
+      --stroke: #1f2a38;
+      --track: #0a1b27;
+      --pill: #111a26;
+      --win: #1abc55;
+      --draw: #f5a623;
+      --loss: #e74c3c;
+      --unk: #55606b;
+      --wr-good: #2ecc71;
+      --wr-mid: #f5a623;
+      --wr-bad: #e74c3c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "DM Sans", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* HEADER */
+    .app-header {
+      background: linear-gradient(180deg, #0d1520 0%, #0b0f14 100%);
+      border-bottom: 1px solid var(--stroke);
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-logo {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .app-logo span {
+      color: var(--accentR);
+    }
+
+    .app-logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #0d1520;
+      border-top: 1px solid var(--stroke);
+      display: flex;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 8px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: "DM Sans", sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+      gap: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .nav-btn.active { color: var(--accentR); }
+
+    /* PAGES */
+    .page { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* LOADING */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--stroke);
+      border-top-color: var(--accentR);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .card-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* SELECT */
+    select {
+      font-family: "DM Sans", sans-serif;
+      font-size: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--ink);
+      width: 100%;
+      margin-bottom: 12px;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aab1ba' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    /* PILLS */
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .pill {
+      background: var(--pill);
+      border: 1px solid var(--stroke);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* H2H STYLES */
+    .h2h-players {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .player-box {
+      padding: 12px;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      background: #0e1520;
+    }
+
+    .player-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+    .player-box .name { font-size: 17px; font-weight: 700; margin-top: 2px; }
+
+    .stat-row { margin: 12px 0; }
+    .stat-row-title {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-row-grid {
+      display: grid;
+      grid-template-columns: 64px 1fr 64px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .val { font-size: 20px; font-weight: 700; text-align: center; }
+
+    .track {
+      position: relative;
+      height: 14px;
+      background: var(--track);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #0c2532;
+    }
+
+    .bar-left, .bar-right {
+      position: absolute; top: 0; bottom: 0; width: 50%;
+    }
+    .bar-left {
+      right: 50%;
+      background: var(--accentL);
+      border-radius: 999px 0 0 999px;
+    }
+    .bar-right {
+      left: 50%;
+      background: var(--accentR);
+      border-radius: 0 999px 999px 0;
+    }
+
+    /* PLAYER STATS STYLES */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+    .stat-box {
+      background: #0e1520;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-box .value { font-size: 22px; font-weight: 700; color: var(--accentR); }
+
+    /* FORM BOXES */
+    .form-boxes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .box {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+    }
+    .box.win { background: var(--win); }
+    .box.draw { background: var(--draw); }
+    .box.loss { background: var(--loss); }
+    .box.unk { background: var(--unk); }
+
+    /* OPPONENTS */
+    .opps-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .opp-card {
+      background: #0d1724;
+      border: 1px solid #233045;
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .opp-name { display: block; font-size: 14px; font-weight: 700; }
+    .opp-count { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .opp-wpr { display: flex; justify-content: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+    .wpr {
+      min-width: 36px; padding: 4px 6px;
+      border-radius: 6px; font-weight: 800; font-size: 12px;
+      color: #fff; text-align: center;
+    }
+    .wpr.win { background: var(--win); }
+    .wpr.loss { background: var(--loss); }
+    .wpr.draw { background: var(--draw); }
+
+    .wr-good { color: var(--wr-good); }
+    .wr-mid { color: var(--wr-mid); }
+    .wr-bad { color: var(--wr-bad); }
+
+    /* AVG BAR */
+    .avg-bar {
+      height: 14px;
+      background: #0a1b27;
+      border: 1px solid #0c2532;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .avg-fill {
+      height: 100%;
+      background: var(--accentR);
+      transition: width 300ms ease;
+    }
+    .avg-value { margin-top: 6px; color: var(--muted); font-size: 13px; text-align: center; }
+
+    .period-row {
+      display: flex; align-items: center; gap: 10px;
+      justify-content: center; margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .period-row label { color: var(--muted); font-size: 13px; }
+    .period-row select { width: auto; margin-bottom: 0; font-size: 14px; padding: 6px 32px 6px 10px; }
+
+    .error { color: #ff8a8a; text-align: center; padding: 16px 0; }
+
+    @media (max-width: 480px) {
+      .opps-wrap { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div>
+      <div class="app-logo">Darts Club <span>Šaľa</span></div>
+      <div class="app-logo-sub">Štatistiky &amp; výsledky</div>
+    </div>
+  </header>
+
+  <!-- PAGES -->
+  <div id="page-h2h" class="page active">
+    <div id="h2h-loading" class="loading">
+      <div class="spinner"></div>
+      <div>Načítavam dáta...</div>
+    </div>
+    <div id="h2h-content" style="display:none">
+      <div class="card-title">Vyber hráčov</div>
+      <select id="p1"></select>
+      <select id="p2"></select>
+
+      <div class="card">
+        <div class="h2h-players">
+          <div class="player-box">
+            <div class="label">Hráč 1</div>
+            <div class="name" id="nameL">-</div>
+          </div>
+          <div class="player-box">
+            <div class="label">Hráč 2</div>
+            <div class="name" id="nameR">-</div>
+          </div>
+        </div>
+        <div id="h2h-pills" class="pill-row"></div>
+        <div id="h2h-rows"></div>
+      </div>
+    </div>
+    <div id="h2h-error" class="error"></div>
+  </div>
+
+  <div id="page-stats" class="page">
+    <div id="stats-loading" class="loading">
+      <div class="spinner"></div>
+      <div>Načítavam dáta...</div>
+    </div>
+    <div id="stats-content" style="display:none">
+      <div class="card-title">Vyber hráča</div>
+      <select id="player"></select>
+      <div class="card">
+        <div id="stats-pills" class="pill-row"></div>
+        <div id="stats-grid"></div>
+      </div>
+    </div>
+    <div id="stats-error" class="error"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="h2h" onclick="switchPage('h2h', this)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      H2H
+    </button>
+    <button class="nav-btn" data-page="stats" onclick="switchPage('stats', this)">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Hráč
+    </button>
+  </nav>
+
+  <script src="js/data.js"></script>
+  <script src="js/h2h.js"></script>
+  <script src="js/stats.js"></script>
+  <script>
+    // PAGE SWITCHING
+    function switchPage(id, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
