@@ -37,6 +37,19 @@ const PERIODS = [
 ];
 
 // ─── NAČÍTANIE DÁT ──────────────────────────────────────────────
+
+// Lokálne JSON súbory pre štatistiky hráčov (Open liga)
+const LOCAL_SEASON_FILES = [
+  "jsons/season8_raw.json",
+  "jsons/season9_slim_no6.json",
+  "jsons/season10_slim.json",
+  "jsons/season11_slim.json",
+  "jsons/season12_slim.json",
+  "jsons/season13_slim.json",
+  "jsons/season14_slim.json",
+  "jsons/season15_slim.json"
+];
+
 async function loadTournamentUrls() {
   const res = await fetch(CORS_PROXY + encodeURIComponent(SHEET_CSV_URL));
   if (!res.ok) throw new Error("Sheet sa nepodarilo načítať");
@@ -45,7 +58,7 @@ async function loadTournamentUrls() {
   return lines.slice(1).map(l => l.replace(/^"|"$/g, "").trim()).filter(Boolean);
 }
 
-// Cache - načítame dáta len raz
+// Cache pre H2H (1. liga z Google Sheets)
 let _tournamentsCache = null;
 
 async function loadTournaments() {
@@ -67,6 +80,30 @@ async function loadTournaments() {
 
   if (!ok.length) throw new Error("Žiadne dáta sa nepodarilo načítať.");
   _tournamentsCache = ok;
+  return ok;
+}
+
+// Cache pre štatistiky hráčov (lokálne JSON súbory)
+let _localTournamentsCache = null;
+
+async function loadLocalTournaments() {
+  if (_localTournamentsCache) return _localTournamentsCache;
+
+  const results = await Promise.allSettled(
+    LOCAL_SEASON_FILES.map(async (path) => {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error("Súbor sa nepodarilo načítať: " + path);
+      const data = await res.json();
+      return Array.isArray(data) ? data : [data];
+    })
+  );
+
+  const ok = results
+    .filter(r => r.status === "fulfilled")
+    .flatMap(r => r.value);
+
+  if (!ok.length) throw new Error("Žiadne lokálne dáta sa nepodarilo načítať.");
+  _localTournamentsCache = ok;
   return ok;
 }
 
@@ -172,6 +209,8 @@ function wrClass(wr) {
 }
 
 // ─── ZDIEĽANÝ STATE ─────────────────────────────────────────────
+
+// H2H dáta (1. liga z Google Sheets)
 let _sharedData = null;
 
 async function getSharedData() {
@@ -184,4 +223,19 @@ async function getSharedData() {
   );
   _sharedData = { tournaments, idToName, nameStats, matches, keys };
   return _sharedData;
+}
+
+// Štatistiky hráčov (lokálne JSON súbory - Open liga)
+let _statsData = null;
+
+async function getStatsData() {
+  if (_statsData) return _statsData;
+  const tournaments = await loadLocalTournaments();
+  const { idToName, nameStats } = buildIdToName(tournaments);
+  const matches = extractMatches(tournaments, idToName);
+  const keys = Array.from(nameStats.keys()).sort((a, b) =>
+    nameStats.get(a).displayName.localeCompare(nameStats.get(b).displayName, "sk")
+  );
+  _statsData = { tournaments, idToName, nameStats, matches, keys };
+  return _statsData;
 }

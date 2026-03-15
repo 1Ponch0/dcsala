@@ -168,7 +168,7 @@ function renderStatsGrid(stats) {
 
 async function initStats() {
   try {
-    const { matches, nameStats, keys } = await getSharedData();
+    const { matches, nameStats, keys } = await getStatsData();
 
     const sel = document.getElementById("player");
     keys.forEach(key => {
