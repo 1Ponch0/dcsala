@@ -510,6 +510,16 @@
         <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Štatistiky
       </button>
+
+      <div class="drawer-section-title" style="margin-top:6px">Ženská liga</div>
+      <button class="drawer-item" id="nav-zenska-rank" onclick="navTo('zenska','rank',this)">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Tabuľka
+      </button>
+      <button class="drawer-item" id="nav-zenska-stats" onclick="navTo('zenska','stats',this)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Štatistiky
+      </button>
     </div>
 
     <div class="drawer-section">
@@ -678,6 +688,12 @@
         stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=stats",
         portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_e1fp_7254",
         label: "Open liga"
+      },
+      zenska: {
+        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_JsyT_4065&tab=rank",
+        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_JsyT_4065&tab=stats",
+        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_JsyT_4065",
+        label: "Ženská liga"
       }
     };
 
