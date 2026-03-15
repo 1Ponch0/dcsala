@@ -35,6 +35,7 @@
       --wr-good: #2ecc71;
       --wr-mid: #f5a623;
       --wr-bad: #e74c3c;
+      --drawer-w: 270px;
     }
 
     * { box-sizing: border-box; }
@@ -45,79 +46,235 @@
       background: var(--bg);
       color: var(--ink);
       min-height: 100vh;
-      padding-bottom: 80px;
     }
 
-    /* HEADER */
+    /* ── HEADER ── */
     .app-header {
       background: linear-gradient(180deg, #0d1520 0%, #0b0f14 100%);
       border-bottom: 1px solid var(--stroke);
-      padding: 16px 20px 12px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
     }
+
+    .hamburger {
+      background: none;
+      border: none;
+      color: var(--ink);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     .app-logo {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 26px;
+      font-size: 24px;
       letter-spacing: 2px;
       color: var(--ink);
       line-height: 1;
     }
-
-    .app-logo span {
-      color: var(--accentR);
-    }
-
+    .app-logo span { color: var(--accentR); }
     .app-logo-sub {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
       letter-spacing: 3px;
       text-transform: uppercase;
     }
 
-    /* BOTTOM NAV */
-    .bottom-nav {
+    /* ── DRAWER OVERLAY ── */
+    .drawer-overlay {
+      display: none;
       position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #0d1520;
-      border-top: 1px solid var(--stroke);
-      display: flex;
-      z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom);
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 300;
     }
+    .drawer-overlay.open { display: block; }
 
-    .nav-btn {
-      flex: 1;
+    /* ── DRAWER ── */
+    .drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--drawer-w);
+      background: #0d1520;
+      border-right: 1px solid var(--stroke);
+      z-index: 400;
+      transform: translateX(-100%);
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 0 8px;
-      background: none;
-      border: none;
+      overflow-y: auto;
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--stroke);
+    }
+    .drawer-logo {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+    }
+    .drawer-logo span { color: var(--accentR); }
+    .drawer-sub {
+      font-size: 10px;
       color: var(--muted);
-      font-family: "DM Sans", sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.2s;
-      gap: 4px;
-      letter-spacing: 0.3px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
     }
 
-    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-    .nav-btn.active { color: var(--accentR); }
+    /* Drawer sections */
+    .drawer-section {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--stroke);
+    }
+    .drawer-section:last-child { border-bottom: none; }
 
-    /* PAGES */
+    .drawer-section-title {
+      padding: 6px 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px 11px 28px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s, color 0.15s;
+      border-radius: 0;
+    }
+    .drawer-item:hover { background: rgba(255,255,255,0.04); }
+    .drawer-item.active {
+      color: var(--ink);
+      background: rgba(209,0,58,0.12);
+      border-left: 3px solid var(--accentR);
+      padding-left: 25px;
+    }
+    .drawer-item svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none; stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
+    .drawer-parent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+    }
+    .drawer-parent svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none; stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
+    /* ── PAGES ── */
     .page { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
     .page.active { display: block; }
 
-    /* LOADING */
+    /* ── PAGE TITLE ── */
+    .page-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .page-title span { color: var(--ink); }
+
+    /* ── TAB TOGGLE ── */
+    .tab-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      background: var(--pill);
+      color: var(--muted);
+      font-family: "DM Sans", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--accentR);
+      border-color: var(--accentR);
+      color: #fff;
+    }
+
+    /* ── IFRAME ── */
+    .iframe-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+      background: #fff;
+    }
+    .iframe-wrap iframe {
+      display: block;
+      width: 100%;
+      height: calc(100vh - 160px);
+      border: none;
+    }
+    .iframe-fallback {
+      display: none;
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--muted);
+    }
+    .open-link-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 24px;
+      background: var(--accentR);
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* ── LOADING ── */
     .loading {
       display: flex;
       flex-direction: column;
@@ -127,7 +284,6 @@
       color: var(--muted);
       gap: 16px;
     }
-
     .spinner {
       width: 36px; height: 36px;
       border: 3px solid var(--stroke);
@@ -135,10 +291,9 @@
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* CARDS */
+    /* ── CARDS ── */
     .card {
       background: var(--card);
       border: 1px solid var(--stroke);
@@ -147,7 +302,6 @@
       margin-bottom: 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
-
     .card-title {
       font-family: "Bebas Neue", sans-serif;
       font-size: 15px;
@@ -157,7 +311,7 @@
       margin-bottom: 12px;
     }
 
-    /* SELECT */
+    /* ── SELECT ── */
     select {
       font-family: "DM Sans", sans-serif;
       font-size: 16px;
@@ -175,14 +329,8 @@
       padding-right: 36px;
     }
 
-    /* PILLS */
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
+    /* ── PILLS ── */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
     .pill {
       background: var(--pill);
       border: 1px solid var(--stroke);
@@ -193,146 +341,60 @@
       white-space: nowrap;
     }
 
-    /* H2H STYLES */
-    .h2h-players {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .player-box {
-      padding: 12px;
-      border: 1px solid var(--stroke);
-      border-radius: 12px;
-      background: #0e1520;
-    }
-
+    /* ── H2H ── */
+    .h2h-players { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .player-box { padding: 12px; border: 1px solid var(--stroke); border-radius: 12px; background: #0e1520; }
     .player-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
     .player-box .name { font-size: 17px; font-weight: 700; margin-top: 2px; }
 
     .stat-row { margin: 12px 0; }
     .stat-row-title {
-      text-align: center;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 8px;
+      text-align: center; font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
     }
-
-    .stat-row-grid {
-      display: grid;
-      grid-template-columns: 64px 1fr 64px;
-      gap: 10px;
-      align-items: center;
-    }
-
+    .stat-row-grid { display: grid; grid-template-columns: 64px 1fr 64px; gap: 10px; align-items: center; }
     .val { font-size: 20px; font-weight: 700; text-align: center; }
-
     .track {
-      position: relative;
-      height: 14px;
-      background: var(--track);
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid #0c2532;
+      position: relative; height: 14px; background: var(--track);
+      border-radius: 999px; overflow: hidden; border: 1px solid #0c2532;
     }
+    .bar-left, .bar-right { position: absolute; top: 0; bottom: 0; width: 50%; }
+    .bar-left { right: 50%; background: var(--accentL); border-radius: 999px 0 0 999px; }
+    .bar-right { left: 50%; background: var(--accentR); border-radius: 0 999px 999px 0; }
 
-    .bar-left, .bar-right {
-      position: absolute; top: 0; bottom: 0; width: 50%;
-    }
-    .bar-left {
-      right: 50%;
-      background: var(--accentL);
-      border-radius: 999px 0 0 999px;
-    }
-    .bar-right {
-      left: 50%;
-      background: var(--accentR);
-      border-radius: 0 999px 999px 0;
-    }
-
-    /* PLAYER STATS STYLES */
+    /* ── PLAYER STATS ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-
-    .stat-box {
-      background: #0e1520;
-      border: 1px solid var(--stroke);
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-    }
-
+    .stat-box { background: #0e1520; border: 1px solid var(--stroke); border-radius: 12px; padding: 12px; text-align: center; }
     .stat-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
     .stat-box .value { font-size: 22px; font-weight: 700; color: var(--accentR); }
 
-    /* FORM BOXES */
     .form-boxes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-    .box {
-      width: 30px; height: 30px;
-      border-radius: 7px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-      color: #fff;
-    }
+    .box { width: 30px; height: 30px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; }
     .box.win { background: var(--win); }
     .box.draw { background: var(--draw); }
     .box.loss { background: var(--loss); }
     .box.unk { background: var(--unk); }
 
-    /* OPPONENTS */
     .opps-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-    .opp-card {
-      background: #0d1724;
-      border: 1px solid #233045;
-      border-radius: 12px;
-      padding: 12px 10px;
-      text-align: center;
-    }
-
+    .opp-card { background: #0d1724; border: 1px solid #233045; border-radius: 12px; padding: 12px 10px; text-align: center; }
     .opp-name { display: block; font-size: 14px; font-weight: 700; }
     .opp-count { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
-
     .opp-wpr { display: flex; justify-content: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-    .wpr {
-      min-width: 36px; padding: 4px 6px;
-      border-radius: 6px; font-weight: 800; font-size: 12px;
-      color: #fff; text-align: center;
-    }
+    .wpr { min-width: 36px; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 12px; color: #fff; text-align: center; }
     .wpr.win { background: var(--win); }
     .wpr.loss { background: var(--loss); }
     .wpr.draw { background: var(--draw); }
 
     .wr-good { color: var(--wr-good); }
-    .wr-mid { color: var(--wr-mid); }
-    .wr-bad { color: var(--wr-bad); }
+    .wr-mid  { color: var(--wr-mid); }
+    .wr-bad  { color: var(--wr-bad); }
 
-    /* AVG BAR */
-    .avg-bar {
-      height: 14px;
-      background: #0a1b27;
-      border: 1px solid #0c2532;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .avg-fill {
-      height: 100%;
-      background: var(--accentR);
-      transition: width 300ms ease;
-    }
+    .avg-bar { height: 14px; background: #0a1b27; border: 1px solid #0c2532; border-radius: 999px; overflow: hidden; }
+    .avg-fill { height: 100%; background: var(--accentR); transition: width 300ms ease; }
     .avg-value { margin-top: 6px; color: var(--muted); font-size: 13px; text-align: center; }
 
-    .period-row {
-      display: flex; align-items: center; gap: 10px;
-      justify-content: center; margin-bottom: 10px; flex-wrap: wrap;
-    }
+    .period-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
     .period-row label { color: var(--muted); font-size: 13px; }
     .period-row select { width: auto; margin-bottom: 0; font-size: 14px; padding: 6px 32px 6px 10px; }
 
@@ -342,153 +404,91 @@
       .opps-wrap { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
     }
-
-    /* SUB NAV */
-    .sub-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .sub-btn {
-      flex: 1;
-      padding: 9px 0;
-      border-radius: 10px;
-      border: 1px solid var(--stroke);
-      background: var(--pill);
-      color: var(--muted);
-      font-family: "DM Sans", sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      transition: color 0.2s, background 0.2s, border-color 0.2s;
-    }
-
-    .sub-btn.active {
-      background: var(--accentR);
-      border-color: var(--accentR);
-      color: #fff;
-    }
-
-    /* TAB TOGGLE (Tabuľka / Štatistiky) */
-    .tab-toggle {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 7px 0;
-      border-radius: 8px;
-      border: 1px solid var(--stroke);
-      background: none;
-      color: var(--muted);
-      font-family: "DM Sans", sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-
-    .tab-btn.active {
-      border-color: var(--accentR);
-      color: var(--accentR);
-    }
-
-    /* IFRAME WRAPPER */
-    .iframe-wrap {
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--stroke);
-      background: #fff;
-    }
-
-    .iframe-wrap iframe {
-      display: block;
-      width: 100%;
-      height: calc(100vh - 220px);
-      border: none;
-    }
-
-    .iframe-fallback {
-      display: none;
-      text-align: center;
-      padding: 32px 16px;
-      color: var(--muted);
-    }
-
-    .open-link-btn {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 20px;
-      background: var(--accentR);
-      color: #fff;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
 
+  <!-- DRAWER OVERLAY -->
+  <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
+  <!-- SIDE DRAWER -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-logo">Darts Club <span>Šaľa</span></div>
+      <div class="drawer-sub">Štatistiky &amp; výsledky</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-parent">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Aktuálna sezóna
+      </div>
+      <div class="drawer-section-title">1. Liga</div>
+      <button class="drawer-item active" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Tabuľka
+      </button>
+      <button class="drawer-item" id="nav-prva-stats" onclick="navTo('prva','stats',this)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Štatistiky
+      </button>
+
+      <div class="drawer-section-title" style="margin-top:6px">Open liga</div>
+      <button class="drawer-item" id="nav-open-rank" onclick="navTo('open','rank',this)">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Tabuľka
+      </button>
+      <button class="drawer-item" id="nav-open-stats" onclick="navTo('open','stats',this)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Štatistiky
+      </button>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-parent">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Štatistiky
+      </div>
+      <button class="drawer-item" id="nav-h2h" onclick="navTo('h2h',null,this)">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        H2H
+      </button>
+      <button class="drawer-item" id="nav-player" onclick="navTo('player',null,this)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hráč
+      </button>
+    </div>
+  </nav>
+
   <!-- HEADER -->
   <header class="app-header">
+    <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
     <div>
       <div class="app-logo">Darts Club <span>Šaľa</span></div>
-      <div class="app-logo-sub">Štatistiky &amp; výsledky</div>
+      <div class="app-logo-sub" id="header-sub">1. Liga · Tabuľka</div>
     </div>
   </header>
 
   <!-- PAGES -->
 
-  <!-- SEZÓNA -->
-  <div id="page-sezona" class="page active">
-    <div class="sub-nav">
-      <button class="sub-btn active" onclick="switchLiga('prva', this)">1. Liga</button>
-      <button class="sub-btn" onclick="switchLiga('open', this)">Open liga</button>
-    </div>
-
-    <div id="liga-prva">
-      <div class="tab-toggle">
-        <button class="tab-btn active" onclick="switchTab('prva', 'rank', this)">Tabuľka</button>
-        <button class="tab-btn" onclick="switchTab('prva', 'stats', this)">Štatistiky</button>
-      </div>
-      <div class="iframe-wrap" id="wrap-prva">
-        <iframe id="iframe-prva"
-          src="https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank"
-          title="1. Liga"
-          loading="lazy">
-        </iframe>
-        <div class="iframe-fallback" id="fallback-prva">
-          <div>Stránku nie je možné zobraziť priamo.</div>
-          <a class="open-link-btn" href="https://n01darts.com/n01/league/portal.php?lgid=lg_KQ1q_3231" target="_blank">Otvoriť n01darts</a>
-        </div>
-      </div>
-    </div>
-
-    <div id="liga-open" style="display:none">
-      <div class="tab-toggle">
-        <button class="tab-btn active" onclick="switchTab('open', 'rank', this)">Tabuľka</button>
-        <button class="tab-btn" onclick="switchTab('open', 'stats', this)">Štatistiky</button>
-      </div>
-      <div class="iframe-wrap" id="wrap-open">
-        <iframe id="iframe-open"
-          src=""
-          data-src="https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=rank"
-          title="Open liga"
-          loading="lazy">
-        </iframe>
-        <div class="iframe-fallback" id="fallback-open">
-          <div>Stránku nie je možné zobraziť priamo.</div>
-          <a class="open-link-btn" href="https://n01darts.com/n01/league/portal.php?lgid=lg_e1fp_7254" target="_blank">Otvoriť n01darts</a>
-        </div>
+  <!-- LIGA PAGE -->
+  <div id="page-liga" class="page active">
+    <div class="iframe-wrap" id="iframe-wrap">
+      <iframe id="liga-iframe"
+        src="https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank"
+        title="Liga"
+        loading="lazy">
+      </iframe>
+      <div class="iframe-fallback" id="iframe-fallback">
+        <div>Stránku nie je možné zobraziť priamo.</div>
+        <a class="open-link-btn" id="iframe-fallback-link" href="#" target="_blank">Otvoriť n01darts</a>
       </div>
     </div>
   </div>
 
+  <!-- H2H PAGE -->
   <div id="page-h2h" class="page">
     <div id="h2h-loading" class="loading">
       <div class="spinner"></div>
@@ -498,7 +498,6 @@
       <div class="card-title">Vyber hráčov</div>
       <select id="p1"></select>
       <select id="p2"></select>
-
       <div class="card">
         <div class="h2h-players">
           <div class="player-box">
@@ -517,6 +516,7 @@
     <div id="h2h-error" class="error"></div>
   </div>
 
+  <!-- PLAYER STATS PAGE -->
   <div id="page-stats" class="page">
     <div id="stats-loading" class="loading">
       <div class="spinner"></div>
@@ -533,22 +533,6 @@
     <div id="stats-error" class="error"></div>
   </div>
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="sezona" onclick="switchPage('sezona', this)">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Sezóna
-    </button>
-    <button class="nav-btn" data-page="h2h" onclick="switchPage('h2h', this)">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      H2H
-    </button>
-    <button class="nav-btn" data-page="stats" onclick="switchPage('stats', this)">
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Hráč
-    </button>
-  </nav>
-
   <script src="data.js"></script>
   <script src="h2h.js"></script>
   <script src="stats.js"></script>
@@ -556,50 +540,78 @@
     const LIGA_URLS = {
       prva: {
         rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank",
-        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=stats"
+        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=stats",
+        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_KQ1q_3231",
+        label: "1. Liga"
       },
       open: {
         rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=rank",
-        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=stats"
+        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=stats",
+        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_e1fp_7254",
+        label: "Open liga"
       }
     };
 
-    const ligaTab = { prva: "rank", open: "rank" };
+    const TAB_LABELS = { rank: "Tabuľka", stats: "Štatistiky" };
 
-    function switchPage(id, btn) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('page-' + id).classList.add('active');
-      btn.classList.add('active');
+    function toggleDrawer() {
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('overlay');
+      const hamburger = document.getElementById('hamburger');
+      const isOpen = drawer.classList.contains('open');
+      drawer.classList.toggle('open', !isOpen);
+      overlay.classList.toggle('open', !isOpen);
+      hamburger.classList.toggle('open', !isOpen);
     }
 
-    function switchLiga(liga, btn) {
-      document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('liga-prva').style.display = liga === 'prva' ? '' : 'none';
-      document.getElementById('liga-open').style.display = liga === 'open' ? '' : 'none';
-      // Lazy load iframe keď sa prvýkrát otvorí
-      const iframeEl = document.getElementById('iframe-' + liga);
-      if (!iframeEl.src || iframeEl.src === window.location.href) {
-        iframeEl.src = LIGA_URLS[liga][ligaTab[liga]];
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    }
+
+    function setActiveNav(id) {
+      document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
+      const el = document.getElementById('nav-' + id);
+      if (el) el.classList.add('active');
+    }
+
+    function navTo(section, tab, btn) {
+      closeDrawer();
+
+      if (section === 'h2h') {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-h2h').classList.add('active');
+        document.getElementById('header-sub').textContent = 'H2H';
+        setActiveNav('h2h');
+        return;
       }
+
+      if (section === 'player') {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-stats').classList.add('active');
+        document.getElementById('header-sub').textContent = 'Hráč · Štatistiky';
+        setActiveNav('player');
+        return;
+      }
+
+      // Liga pages
+      const url = LIGA_URLS[section][tab];
+      const iframe = document.getElementById('liga-iframe');
+      iframe.src = url;
+      document.getElementById('iframe-fallback-link').href = LIGA_URLS[section].portal;
+      document.getElementById('header-sub').textContent =
+        LIGA_URLS[section].label + ' · ' + TAB_LABELS[tab];
+
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-liga').classList.add('active');
+      setActiveNav(section + '-' + tab);
     }
 
-    function switchTab(liga, tab, btn) {
-      const wrap = document.getElementById('wrap-' + liga);
-      wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      ligaTab[liga] = tab;
-      document.getElementById('iframe-' + liga).src = LIGA_URLS[liga][tab];
-    }
-
-    // Detekcia blokovaného iframu
-    ['prva', 'open'].forEach(liga => {
-      const iframe = document.getElementById('iframe-' + liga);
-      iframe.addEventListener('error', () => {
-        iframe.style.display = 'none';
-        document.getElementById('fallback-' + liga).style.display = 'block';
-      });
+    // Iframe fallback
+    document.getElementById('liga-iframe').addEventListener('error', () => {
+      document.getElementById('liga-iframe').style.display = 'none';
+      document.getElementById('iframe-fallback').style.display = 'block';
     });
 
     // SERVICE WORKER
