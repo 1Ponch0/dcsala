@@ -342,6 +342,94 @@
       .opps-wrap { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
     }
+
+    /* SUB NAV */
+    .sub-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .sub-btn {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      background: var(--pill);
+      color: var(--muted);
+      font-family: "DM Sans", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+    }
+
+    .sub-btn.active {
+      background: var(--accentR);
+      border-color: var(--accentR);
+      color: #fff;
+    }
+
+    /* TAB TOGGLE (Tabuľka / Štatistiky) */
+    .tab-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: 8px;
+      border: 1px solid var(--stroke);
+      background: none;
+      color: var(--muted);
+      font-family: "DM Sans", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab-btn.active {
+      border-color: var(--accentR);
+      color: var(--accentR);
+    }
+
+    /* IFRAME WRAPPER */
+    .iframe-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+      background: #fff;
+    }
+
+    .iframe-wrap iframe {
+      display: block;
+      width: 100%;
+      height: calc(100vh - 220px);
+      border: none;
+    }
+
+    .iframe-fallback {
+      display: none;
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+    }
+
+    .open-link-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 20px;
+      background: var(--accentR);
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -355,7 +443,53 @@
   </header>
 
   <!-- PAGES -->
-  <div id="page-h2h" class="page active">
+
+  <!-- SEZÓNA -->
+  <div id="page-sezona" class="page active">
+    <div class="sub-nav">
+      <button class="sub-btn active" onclick="switchLiga('prva', this)">1. Liga</button>
+      <button class="sub-btn" onclick="switchLiga('open', this)">Open liga</button>
+    </div>
+
+    <div id="liga-prva">
+      <div class="tab-toggle">
+        <button class="tab-btn active" onclick="switchTab('prva', 'rank', this)">Tabuľka</button>
+        <button class="tab-btn" onclick="switchTab('prva', 'stats', this)">Štatistiky</button>
+      </div>
+      <div class="iframe-wrap" id="wrap-prva">
+        <iframe id="iframe-prva"
+          src="https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank"
+          title="1. Liga"
+          loading="lazy">
+        </iframe>
+        <div class="iframe-fallback" id="fallback-prva">
+          <div>Stránku nie je možné zobraziť priamo.</div>
+          <a class="open-link-btn" href="https://n01darts.com/n01/league/portal.php?lgid=lg_KQ1q_3231" target="_blank">Otvoriť n01darts</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="liga-open" style="display:none">
+      <div class="tab-toggle">
+        <button class="tab-btn active" onclick="switchTab('open', 'rank', this)">Tabuľka</button>
+        <button class="tab-btn" onclick="switchTab('open', 'stats', this)">Štatistiky</button>
+      </div>
+      <div class="iframe-wrap" id="wrap-open">
+        <iframe id="iframe-open"
+          src=""
+          data-src="https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=rank"
+          title="Open liga"
+          loading="lazy">
+        </iframe>
+        <div class="iframe-fallback" id="fallback-open">
+          <div>Stránku nie je možné zobraziť priamo.</div>
+          <a class="open-link-btn" href="https://n01darts.com/n01/league/portal.php?lgid=lg_e1fp_7254" target="_blank">Otvoriť n01darts</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-h2h" class="page">
     <div id="h2h-loading" class="loading">
       <div class="spinner"></div>
       <div>Načítavam dáta...</div>
@@ -401,7 +535,11 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="h2h" onclick="switchPage('h2h', this)">
+    <button class="nav-btn active" data-page="sezona" onclick="switchPage('sezona', this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Sezóna
+    </button>
+    <button class="nav-btn" data-page="h2h" onclick="switchPage('h2h', this)">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       H2H
     </button>
@@ -415,13 +553,54 @@
   <script src="h2h.js"></script>
   <script src="stats.js"></script>
   <script>
-    // PAGE SWITCHING
+    const LIGA_URLS = {
+      prva: {
+        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank",
+        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=stats"
+      },
+      open: {
+        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=rank",
+        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=stats"
+      }
+    };
+
+    const ligaTab = { prva: "rank", open: "rank" };
+
     function switchPage(id, btn) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('page-' + id).classList.add('active');
       btn.classList.add('active');
     }
+
+    function switchLiga(liga, btn) {
+      document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('liga-prva').style.display = liga === 'prva' ? '' : 'none';
+      document.getElementById('liga-open').style.display = liga === 'open' ? '' : 'none';
+      // Lazy load iframe keď sa prvýkrát otvorí
+      const iframeEl = document.getElementById('iframe-' + liga);
+      if (!iframeEl.src || iframeEl.src === window.location.href) {
+        iframeEl.src = LIGA_URLS[liga][ligaTab[liga]];
+      }
+    }
+
+    function switchTab(liga, tab, btn) {
+      const wrap = document.getElementById('wrap-' + liga);
+      wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ligaTab[liga] = tab;
+      document.getElementById('iframe-' + liga).src = LIGA_URLS[liga][tab];
+    }
+
+    // Detekcia blokovaného iframu
+    ['prva', 'open'].forEach(liga => {
+      const iframe = document.getElementById('iframe-' + liga);
+      iframe.addEventListener('error', () => {
+        iframe.style.display = 'none';
+        document.getElementById('fallback-' + liga).style.display = 'block';
+      });
+    });
 
     // SERVICE WORKER
     if ('serviceWorker' in navigator) {
