@@ -500,6 +500,8 @@
     }
     .home-round.played { background: #0e1a14; border-color: #1a3a28; }
     .home-round.upcoming { background: #0e141a; border-color: #1a2a3a; }
+    a.home-round.clickable { display: block; text-decoration: none; cursor: pointer; transition: border-color .2s, background .2s; }
+    a.home-round.clickable:hover { background: #132035; border-color: #5b8dd9; }
     .hr-label {
       font-size: 10px;
       font-weight: 700;
@@ -828,7 +830,8 @@
 
           const now = Date.now();
           const TWO_DAYS = 2 * 24 * 3600 * 1000;
-          const rounds = Object.values(data).map(t => ({
+          const rounds = Object.entries(data).map(([tdid, t]) => ({
+            tdid,
             title: t.title,
             createTime: t.createTime,
             updateTime: t.updateTime,
@@ -850,11 +853,12 @@
             </div>`;
           }
           if (next) {
-            html += `<div class="home-round upcoming">
+            const regUrl = `https://n01darts.com/n01/tournament/portal.php?tdid=${next.tdid}`;
+            html += `<a class="home-round upcoming clickable" href="${regUrl}" target="_blank" rel="noopener">
               <div class="hr-label">Ďalšie kolo</div>
               <div class="hr-title">${next.title}</div>
-              <div class="hr-date">Čoskoro</div>
-            </div>`;
+              <div class="hr-date">Prihlásiť sa →</div>
+            </a>`;
           } else {
             html += `<div class="home-round upcoming">
               <div class="hr-label">Ďalšie kolo</div>
