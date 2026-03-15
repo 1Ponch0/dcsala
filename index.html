@@ -501,7 +501,8 @@
     .home-round.played { background: #0e1a14; border-color: #1a3a28; }
     .home-round.upcoming { background: #0e141a; border-color: #1a2a3a; }
     a.home-round.clickable { display: block; text-decoration: none; cursor: pointer; transition: border-color .2s, background .2s; }
-    a.home-round.clickable:hover { background: #132035; border-color: #5b8dd9; }
+    a.home-round.upcoming.clickable:hover { background: #132035; border-color: #5b8dd9; }
+    a.home-round.played.clickable:hover { background: #0a2018; border-color: var(--win); }
     .hr-label {
       font-size: 10px;
       font-weight: 700;
@@ -844,17 +845,17 @@
           const last = played[0];
           const next = upcoming[0];
 
+          const portalUrl = LIGA_URLS[lg.key]?.portal || '';
           let html = '<div class="home-rounds">';
           if (last) {
-            html += `<div class="home-round played">
+            html += `<a class="home-round played clickable" href="${portalUrl}" target="_blank" rel="noopener">
               <div class="hr-label">Posledné kolo</div>
               <div class="hr-title">${last.title}</div>
-              <div class="hr-date">${fmtDate(last.updateTime)}</div>
-            </div>`;
+              <div class="hr-date">${fmtDate(last.updateTime)} →</div>
+            </a>`;
           }
           if (next) {
-            const regUrl = `https://n01darts.com/n01/tournament/portal.php?tdid=${next.tdid}`;
-            html += `<a class="home-round upcoming clickable" href="${regUrl}" target="_blank" rel="noopener">
+            html += `<a class="home-round upcoming clickable" href="${portalUrl}" target="_blank" rel="noopener">
               <div class="hr-label">Ďalšie kolo</div>
               <div class="hr-title">${next.title}</div>
               <div class="hr-date">Prihlásiť sa →</div>
