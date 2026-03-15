@@ -845,7 +845,7 @@
           const last = played[0];
           const next = upcoming[0];
 
-          const tournamentUrl = tdid => `https://n01darts.com/n01/league/portal.php?lgid=${tdid}`;
+          const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
           let html = '<div class="home-rounds">';
           if (last) {
             html += `<a class="home-round played clickable" href="${tournamentUrl(last.tdid)}" target="_blank" rel="noopener">
