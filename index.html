@@ -826,11 +826,14 @@
           const res = await fetch(CORS_PROXY + encodeURIComponent(url));
           const data = await res.json();
 
+          const now = Date.now();
+          const TWO_DAYS = 2 * 24 * 3600 * 1000;
           const rounds = Object.values(data).map(t => ({
             title: t.title,
             createTime: t.createTime,
             updateTime: t.updateTime,
             played: (t.updateTime / 1000 - t.createTime) > 300
+                 && (now - t.updateTime) > TWO_DAYS
           }));
 
           const played   = rounds.filter(r => r.played).sort((a, b) => b.updateTime - a.updateTime);
