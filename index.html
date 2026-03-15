@@ -468,6 +468,68 @@
 
     .error { color: #ff8a8a; text-align: center; padding: 16px 0; }
 
+    /* ── HOME PAGE ── */
+    .home-league-card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .home-league-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--ink);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-league-title span { color: var(--accentR); }
+    .home-rounds {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .home-round {
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--stroke);
+    }
+    .home-round.played { background: #0e1a14; border-color: #1a3a28; }
+    .home-round.upcoming { background: #0e141a; border-color: #1a2a3a; }
+    .hr-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .home-round.played .hr-label { color: var(--win); }
+    .home-round.upcoming .hr-label { color: #5b8dd9; }
+    .hr-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .hr-date { font-size: 11px; color: var(--muted); }
+    .home-round-loading { color: var(--muted); font-size: 12px; padding: 8px 0; }
+    .home-view-btn {
+      display: block;
+      margin-top: 12px;
+      padding: 8px 0;
+      background: none;
+      border: 1px solid var(--stroke);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: "DM Sans", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      letter-spacing: 0.5px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .home-view-btn:hover { border-color: var(--accentR); color: var(--accentR); }
+
     @media (max-width: 480px) {
       .opps-wrap { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -487,12 +549,19 @@
     </div>
 
     <div class="drawer-section">
-      <div class="drawer-parent">
+      <button class="drawer-item active" id="nav-home" onclick="navTo('home',null,this)">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Domov
+      </button>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-parent">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Aktuálna sezóna
       </div>
       <div class="drawer-section-title">1. Liga</div>
-      <button class="drawer-item active" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
+      <button class="drawer-item" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
         <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         Tabuľka
       </button>
@@ -598,8 +667,27 @@
 
   <!-- PAGES -->
 
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <div class="home-league-card" id="home-card-prva">
+      <div class="home-league-title">1. <span>Liga</span></div>
+      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
+      <button class="home-view-btn" onclick="navTo('prva','rank',null)">Otvoriť ligu →</button>
+    </div>
+    <div class="home-league-card" id="home-card-open">
+      <div class="home-league-title">Open <span>liga</span></div>
+      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
+      <button class="home-view-btn" onclick="navTo('open','rank',null)">Otvoriť ligu →</button>
+    </div>
+    <div class="home-league-card" id="home-card-zenska">
+      <div class="home-league-title">Ženská <span>liga</span></div>
+      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
+      <button class="home-view-btn" onclick="navTo('zenska','rank',null)">Otvoriť ligu →</button>
+    </div>
+  </div>
+
   <!-- LIGA PAGE -->
-  <div id="page-liga" class="page active">
+  <div id="page-liga" class="page">
     <div class="iframe-wrap" id="iframe-wrap">
       <div class="iframe-loader" id="iframe-loader">
         <div class="spinner"></div>
@@ -699,6 +787,69 @@
 
     const TAB_LABELS = { rank: "Tabuľka", stats: "Štatistiky" };
 
+    const HOME_LEAGUES = [
+      { id: 'lg_KQ1q_3231', label: '1. Liga',     key: 'prva'   },
+      { id: 'lg_e1fp_7254', label: 'Open liga',   key: 'open'   },
+      { id: 'lg_JsyT_4065', label: 'Ženská liga', key: 'zenska' }
+    ];
+
+    const T_LIST_BASE = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=';
+
+    function fmtDate(ms) {
+      return new Date(ms).toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    async function loadHomeData() {
+      for (const lg of HOME_LEAGUES) {
+        const card = document.getElementById('home-card-' + lg.key);
+        try {
+          const url = T_LIST_BASE + lg.id;
+          const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+          const data = await res.json();
+
+          const rounds = Object.values(data).map(t => ({
+            title: t.title,
+            createTime: t.createTime,
+            updateTime: t.updateTime,
+            played: (t.updateTime / 1000 - t.createTime) > 300
+          }));
+
+          const played   = rounds.filter(r => r.played).sort((a, b) => b.updateTime - a.updateTime);
+          const upcoming = rounds.filter(r => !r.played).sort((a, b) => a.createTime - b.createTime);
+          const last = played[0];
+          const next = upcoming[0];
+
+          let html = '<div class="home-rounds">';
+          if (last) {
+            html += `<div class="home-round played">
+              <div class="hr-label">Posledné kolo</div>
+              <div class="hr-title">${last.title}</div>
+              <div class="hr-date">${fmtDate(last.updateTime)}</div>
+            </div>`;
+          }
+          if (next) {
+            html += `<div class="home-round upcoming">
+              <div class="hr-label">Ďalšie kolo</div>
+              <div class="hr-title">${next.title}</div>
+              <div class="hr-date">Čoskoro</div>
+            </div>`;
+          } else {
+            html += `<div class="home-round upcoming">
+              <div class="hr-label">Ďalšie kolo</div>
+              <div class="hr-title">Čoskoro</div>
+              <div class="hr-date">—</div>
+            </div>`;
+          }
+          html += '</div>';
+
+          card.querySelector('.home-rounds').outerHTML = html;
+        } catch (e) {
+          card.querySelector('.home-rounds').innerHTML =
+            '<div class="home-round-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
+        }
+      }
+    }
+
     function toggleDrawer() {
       const drawer = document.getElementById('drawer');
       const overlay = document.getElementById('overlay');
@@ -723,6 +874,14 @@
 
     function navTo(section, tab, btn) {
       closeDrawer();
+
+      if (section === 'home') {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-home').classList.add('active');
+        document.getElementById('header-sub').textContent = 'Aktuálne kola';
+        setActiveNav('home');
+        return;
+      }
 
       if (section === 'h2h') {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -795,6 +954,9 @@
       ligaIframe.style.display = 'none';
       document.getElementById('iframe-fallback').style.display = 'block';
     });
+
+    // Načítaj home dáta pri štarte
+    loadHomeData();
 
     // SERVICE WORKER
     if ('serviceWorker' in navigator) {
