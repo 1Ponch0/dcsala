@@ -608,10 +608,7 @@
         </span>
         <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="drawer-group-items" id="grpitems-hist-prva">
-        <button class="drawer-item" onclick="loadHistSeason('lg_9hzN_9789','1. Liga · 15. Sezóna')">15. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_tePo_7368','1. Liga · 14. Sezóna')">14. Sezóna</button>
-      </div>
+      <div class="drawer-group-items" id="grpitems-hist-prva"></div>
 
       <!-- Open liga toggle -->
       <button class="drawer-group-toggle" id="grp-hist-open" onclick="toggleGroup('hist-open')">
@@ -621,16 +618,7 @@
         </span>
         <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="drawer-group-items" id="grpitems-hist-open">
-        <button class="drawer-item" onclick="loadHistSeason('lg_Kj1o_1149','Open liga · 15. Sezóna')">15. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_aVoW_3261','Open liga · 14. Sezóna')">14. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_0Pky_8547','Open liga · 13. Sezóna')">13. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_wNj0_0892','Open liga · 12. Sezóna')">12. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_Qhgo_6442','Open liga · 11. Sezóna')">11. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_9PCO_4725','Open liga · 10. Sezóna')">10. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_2gIA_0928','Open liga · 9. Sezóna')">9. Sezóna</button>
-        <button class="drawer-item" onclick="loadHistSeason('lg_P4in_9002','Open liga · 8. Sezóna')">8. Sezóna</button>
-      </div>
+      <div class="drawer-group-items" id="grpitems-hist-open"></div>
 
       <!-- Historická tabuľka -->
       <button class="drawer-group-toggle" id="nav-hist-table" onclick="navTo('hist-table',null,this)">
@@ -799,6 +787,18 @@
       return urls;
     }
 
+    const HIST_LABELS = { prva: '1. Liga', open: 'Open liga' };
+
+    function buildHistMenu(hist) {
+      for (const [key, seasons] of Object.entries(hist)) {
+        const el = document.getElementById('grpitems-hist-' + key);
+        if (!el) continue;
+        el.innerHTML = seasons.map(s =>
+          `<button class="drawer-item" onclick="loadHistSeason('${s.lgid}','${HIST_LABELS[key] || key} · ${s.label}')">${s.label}</button>`
+        ).join('');
+      }
+    }
+
     async function initApp() {
       try {
         const res = await fetch('aktualnesezony.json?t=' + Date.now());
@@ -811,6 +811,13 @@
         }));
       } catch (e) {
         console.warn('aktualnesezony.json sa nepodarilo načítať', e);
+      }
+      try {
+        const res = await fetch('predoslesezony.json?t=' + Date.now());
+        const hist = await res.json();
+        buildHistMenu(hist);
+      } catch (e) {
+        console.warn('predoslesezony.json sa nepodarilo načítať', e);
       }
       loadHomeData();
     }

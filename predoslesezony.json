@@ -1,0 +1,16 @@
+{
+  "prva": [
+    { "label": "15. Sezóna", "lgid": "lg_9hzN_9789" },
+    { "label": "14. Sezóna", "lgid": "lg_tePo_7368" }
+  ],
+  "open": [
+    { "label": "15. Sezóna", "lgid": "lg_Kj1o_1149" },
+    { "label": "14. Sezóna", "lgid": "lg_aVoW_3261" },
+    { "label": "13. Sezóna", "lgid": "lg_0Pky_8547" },
+    { "label": "12. Sezóna", "lgid": "lg_wNj0_0892" },
+    { "label": "11. Sezóna", "lgid": "lg_Qhgo_6442" },
+    { "label": "10. Sezóna", "lgid": "lg_9PCO_4725" },
+    { "label": "9. Sezóna",  "lgid": "lg_2gIA_0928" },
+    { "label": "8. Sezóna",  "lgid": "lg_P4in_9002" }
+  ]
+}
