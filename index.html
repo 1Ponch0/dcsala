@@ -845,17 +845,17 @@
           const last = played[0];
           const next = upcoming[0];
 
-          const portalUrl = LIGA_URLS[lg.key]?.portal || '';
+          const portalBase = `https://n01darts.com/n01/league/portal.php?lgid=${lg.id}`;
           let html = '<div class="home-rounds">';
           if (last) {
-            html += `<a class="home-round played clickable" href="${portalUrl}" target="_blank" rel="noopener">
+            html += `<a class="home-round played clickable" href="${portalBase}&tdid=${last.tdid}" target="_blank" rel="noopener">
               <div class="hr-label">Posledné kolo</div>
               <div class="hr-title">${last.title}</div>
               <div class="hr-date">${fmtDate(last.updateTime)} →</div>
             </a>`;
           }
           if (next) {
-            html += `<a class="home-round upcoming clickable" href="${portalUrl}" target="_blank" rel="noopener">
+            html += `<a class="home-round upcoming clickable" href="${portalBase}&tdid=${next.tdid}" target="_blank" rel="noopener">
               <div class="hr-label">Ďalšie kolo</div>
               <div class="hr-title">${next.title}</div>
               <div class="hr-date">Prihlásiť sa →</div>
