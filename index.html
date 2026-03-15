@@ -247,6 +247,7 @@
     /* ── PAGES ── */
     .page { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
     .page.active { display: block; }
+    #page-liga, #page-hist-table { padding: 0; max-width: none; }
 
     /* ── PAGE TITLE ── */
     .page-title {
@@ -286,16 +287,15 @@
 
     /* ── IFRAME ── */
     .iframe-wrap {
-      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid var(--stroke);
+      border-top: 1px solid var(--stroke);
       background: #fff;
       position: relative;
     }
     .iframe-wrap iframe {
       display: block;
       width: 100%;
-      height: calc(100vh - 160px);
+      height: calc(100vh - 80px);
       border: none;
     }
     .iframe-loader {
@@ -331,14 +331,13 @@
       font-size: 14px;
     }
     .sheets-wrap {
-      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid var(--stroke);
+      border-top: 1px solid var(--stroke);
     }
     .sheets-wrap iframe {
       display: block;
       width: 100%;
-      height: calc(100vh - 160px);
+      height: calc(100vh - 80px);
       border: none;
     }
 
