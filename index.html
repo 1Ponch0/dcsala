@@ -284,6 +284,7 @@
       overflow: hidden;
       border: 1px solid var(--stroke);
       background: #fff;
+      position: relative;
     }
     .iframe-wrap iframe {
       display: block;
@@ -291,6 +292,21 @@
       height: calc(100vh - 160px);
       border: none;
     }
+    .iframe-loader {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      z-index: 10;
+      border-radius: 12px;
+    }
+    .iframe-loader.hidden { display: none; }
     .iframe-fallback {
       display: none;
       text-align: center;
@@ -307,6 +323,17 @@
       text-decoration: none;
       font-weight: 700;
       font-size: 14px;
+    }
+    .sheets-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+    }
+    .sheets-wrap iframe {
+      display: block;
+      width: 100%;
+      height: calc(100vh - 160px);
+      border: none;
     }
 
     /* ── LOADING ── */
@@ -498,6 +525,12 @@
         <button class="drawer-item" onclick="loadHistSeason('lg_tePo_7368','1. Liga · 14. Sezóna')">14. Sezóna</button>
       </div>
 
+      <!-- Historická tabuľka -->
+      <button class="drawer-item" id="nav-hist-table" onclick="navTo('hist-table',null,this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+        Historická tabuľka
+      </button>
+
       <!-- Open liga toggle -->
       <button class="drawer-group-toggle" id="grp-hist-open" onclick="toggleGroup('hist-open')">
         <span class="gtitle">
@@ -550,16 +583,29 @@
   <!-- LIGA PAGE -->
   <div id="page-liga" class="page active">
     <div class="iframe-wrap" id="iframe-wrap">
+      <div class="iframe-loader" id="iframe-loader">
+        <div class="spinner"></div>
+        <div>Načítavam ligu...</div>
+      </div>
       <iframe id="liga-iframe"
         src="https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank"
         title="Liga"
-        loading="lazy"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
       </iframe>
       <div class="iframe-fallback" id="iframe-fallback">
         <div>Stránku nie je možné zobraziť priamo.</div>
         <a class="open-link-btn" id="iframe-fallback-link" href="#" target="_blank">Otvoriť n01darts</a>
       </div>
+    </div>
+  </div>
+
+  <!-- HISTORICKÁ TABUĽKA PAGE -->
+  <div id="page-hist-table" class="page">
+    <div class="sheets-wrap">
+      <iframe
+        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTwE-6sxBBsJ7nChqKfsBYCwy1DYhtZnWuGKAq90ZkYWzpiU3mcmhifqKxp5OSA6KD6R8AKNRSkzxMi/pubhtml?gid=0&single=true&widget=true&headers=false"
+        title="Historická tabuľka">
+      </iframe>
     </div>
   </div>
 
@@ -670,9 +716,18 @@
         return;
       }
 
+      if (section === 'hist-table') {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-hist-table').classList.add('active');
+        document.getElementById('header-sub').textContent = 'Historická tabuľka';
+        setActiveNav('hist-table');
+        return;
+      }
+
       // Liga pages
       const url = LIGA_URLS[section][tab];
       const iframe = document.getElementById('liga-iframe');
+      document.getElementById('iframe-loader').classList.remove('hidden');
       iframe.src = url;
       document.getElementById('iframe-fallback-link').href = LIGA_URLS[section].portal;
       document.getElementById('header-sub').textContent =
@@ -696,6 +751,7 @@
       const iframe = document.getElementById('liga-iframe');
       iframe.style.display = 'block';
       document.getElementById('iframe-fallback').style.display = 'none';
+      document.getElementById('iframe-loader').classList.remove('hidden');
       iframe.src = url;
       document.getElementById('iframe-fallback-link').href =
         'https://n01darts.com/n01/league/portal.php?lgid=' + lgid;
@@ -705,9 +761,14 @@
       document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
     }
 
-    // Iframe fallback
-    document.getElementById('liga-iframe').addEventListener('error', () => {
-      document.getElementById('liga-iframe').style.display = 'none';
+    // Iframe load / error
+    const ligaIframe = document.getElementById('liga-iframe');
+    ligaIframe.addEventListener('load', () => {
+      document.getElementById('iframe-loader').classList.add('hidden');
+    });
+    ligaIframe.addEventListener('error', () => {
+      document.getElementById('iframe-loader').classList.add('hidden');
+      ligaIframe.style.display = 'none';
       document.getElementById('iframe-fallback').style.display = 'block';
     });
 
