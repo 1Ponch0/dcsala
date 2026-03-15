@@ -764,34 +764,53 @@
   <script src="h2h.js"></script>
   <script src="stats.js"></script>
   <script>
-    const LIGA_URLS = {
-      prva: {
-        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank",
-        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=stats",
-        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_KQ1q_3231",
-        label: "1. Liga"
-      },
-      open: {
-        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=rank",
-        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_e1fp_7254&tab=stats",
-        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_e1fp_7254",
-        label: "Open liga"
-      },
-      zenska: {
-        rank:  "https://n01darts.com/n01/league/l_stats.html?id=lg_JsyT_4065&tab=rank",
-        stats: "https://n01darts.com/n01/league/l_stats.html?id=lg_JsyT_4065&tab=stats",
-        portal: "https://n01darts.com/n01/league/portal.php?lgid=lg_JsyT_4065",
-        label: "Ženská liga"
-      }
+    const LEAGUE_META = {
+      prva:   { label: '1. Liga'     },
+      open:   { label: 'Open liga'   },
+      zenska: { label: 'Ženská liga' }
     };
 
     const TAB_LABELS = { rank: "Tabuľka", stats: "Štatistiky" };
 
-    const HOME_LEAGUES = [
-      { id: 'lg_KQ1q_3231', label: '1. Liga',     key: 'prva'   },
-      { id: 'lg_e1fp_7254', label: 'Open liga',   key: 'open'   },
-      { id: 'lg_JsyT_4065', label: 'Ženská liga', key: 'zenska' }
-    ];
+    // Načítané dynamicky z aktualnesezony.json
+    let LIGA_URLS = {};
+    let HOME_LEAGUES = [];
+
+    function lgidFromUrl(url) {
+      const m = url.match(/lgid=(lg_[^&]+)/);
+      return m ? m[1] : null;
+    }
+
+    function buildLigaUrls(cfg) {
+      const urls = {};
+      for (const [key, portalUrl] of Object.entries(cfg)) {
+        const id = lgidFromUrl(portalUrl);
+        urls[key] = {
+          rank:   `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=rank`,
+          stats:  `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=stats`,
+          portal: portalUrl,
+          label:  LEAGUE_META[key]?.label || key,
+          id
+        };
+      }
+      return urls;
+    }
+
+    async function initApp() {
+      try {
+        const res = await fetch('aktualnesezony.json?t=' + Date.now());
+        const cfg = await res.json();
+        LIGA_URLS = buildLigaUrls(cfg);
+        HOME_LEAGUES = Object.entries(cfg).map(([key, url]) => ({
+          key,
+          id: lgidFromUrl(url),
+          label: LEAGUE_META[key]?.label || key
+        }));
+      } catch (e) {
+        console.warn('aktualnesezony.json sa nepodarilo načítať', e);
+      }
+      loadHomeData();
+    }
 
     const T_LIST_BASE = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=';
 
@@ -955,8 +974,8 @@
       document.getElementById('iframe-fallback').style.display = 'block';
     });
 
-    // Načítaj home dáta pri štarte
-    loadHomeData();
+    // Inicializácia — načítaj aktualnesezony.json, potom home dáta
+    initApp();
 
     // SERVICE WORKER
     if ('serviceWorker' in navigator) {
