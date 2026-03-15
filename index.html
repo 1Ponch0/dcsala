@@ -231,10 +231,12 @@
     .drawer-group-toggle.open .chevron { transform: rotate(180deg); }
 
     .drawer-group-items {
-      display: none;
+      max-height: 0;
+      overflow: hidden;
       padding-left: 8px;
+      transition: max-height 0.25s ease;
     }
-    .drawer-group-items.open { display: block; }
+    .drawer-group-items.open { max-height: 400px; }
 
     /* ── PAGES ── */
     .page { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
@@ -484,27 +486,27 @@
       </div>
 
       <!-- 1. Liga toggle -->
-      <button class="drawer-group-toggle" id="grp-prva" onclick="toggleGroup('prva')">
+      <button class="drawer-group-toggle" id="grp-hist-prva" onclick="toggleGroup('hist-prva')">
         <span class="gtitle">
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           1. Liga
         </span>
         <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="drawer-group-items" id="grpitems-prva">
+      <div class="drawer-group-items" id="grpitems-hist-prva">
         <button class="drawer-item" onclick="loadHistSeason('lg_9hzN_9789','1. Liga · 15. Sezóna')">15. Sezóna</button>
         <button class="drawer-item" onclick="loadHistSeason('lg_tePo_7368','1. Liga · 14. Sezóna')">14. Sezóna</button>
       </div>
 
       <!-- Open liga toggle -->
-      <button class="drawer-group-toggle" id="grp-open" onclick="toggleGroup('open')">
+      <button class="drawer-group-toggle" id="grp-hist-open" onclick="toggleGroup('hist-open')">
         <span class="gtitle">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           Open liga
         </span>
         <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="drawer-group-items" id="grpitems-open">
+      <div class="drawer-group-items" id="grpitems-hist-open">
         <button class="drawer-item" onclick="loadHistSeason('lg_Kj1o_1149','Open liga · 15. Sezóna')">15. Sezóna</button>
         <button class="drawer-item" onclick="loadHistSeason('lg_aVoW_3261','Open liga · 14. Sezóna')">14. Sezóna</button>
         <button class="drawer-item" onclick="loadHistSeason('lg_0Pky_8547','Open liga · 13. Sezóna')">13. Sezóna</button>
@@ -551,7 +553,8 @@
       <iframe id="liga-iframe"
         src="https://n01darts.com/n01/league/l_stats.html?id=lg_KQ1q_3231&tab=rank"
         title="Liga"
-        loading="lazy">
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
       </iframe>
       <div class="iframe-fallback" id="iframe-fallback">
         <div>Stránku nie je možné zobraziť priamo.</div>
