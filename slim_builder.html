@@ -122,6 +122,10 @@ t_96CX_4231
 </div>
 
 <script>
+window.onerror = function(msg, src, line, col, err) {
+  alert('JS chyba:\n' + msg + '\nRiadok: ' + line + '\n' + (err ? err.stack : ''));
+};
+
 const API = 'https://api.n01darts.com/n01/tournament/n01_tournament.php?cmd=get_data&tdid=';
 let resultData = [];
 
@@ -167,7 +171,7 @@ function setBar(done, total) {
 }
 
 function toSlim(raw, tdid) {
-  const t = raw.tournament ?? raw;
+  const t = raw.tournament || raw;
   return {
     tdid:       t.tdid       || tdid,
     title:      t.title      || '',
@@ -179,8 +183,8 @@ function toSlim(raw, tdid) {
       if (p.c)        s.c = p.c;
       return s;
     }),
-    rr_result: raw.rr_result ?? t.rr_result ?? {},
-    t_result:  raw.t_result  ?? t.t_result  ?? {},
+    rr_result: raw.rr_result || t.rr_result || {},
+    t_result:  raw.t_result  || t.t_result  || {},
   };
 }
 
