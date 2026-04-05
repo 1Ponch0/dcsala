@@ -200,41 +200,48 @@ async function fetchOne(tdid) {
 }
 
 async function startFetch() {
-  const ids = parseTdids();
-  if (!ids.length) {
-    document.getElementById('prog-card').style.display = '';
-    document.getElementById('log').innerHTML = '';
-    log('⚠ Žiadne platné ID sa nenašlo. Skontroluj formát linkov.', 'err');
-    log('Očakávaný formát: season.php?id=t_XXXX_1234  alebo  t_XXXX_1234', 'warn');
-    return;
-  }
+  try {
+    const progCard = document.getElementById('prog-card');
+    const logEl    = document.getElementById('log');
+    progCard.style.display = '';
+    logEl.innerHTML = '';
 
-  document.getElementById('prog-card').style.display = '';
-  document.getElementById('out-card').style.display  = 'none';
-  document.getElementById('log').innerHTML = '';
-  document.getElementById('fetchBtn').disabled = true;
-  resultData = [];
-  setBar(0, ids.length);
-  log(`Spúšťam ${ids.length} kôl...`, 'warn');
+    const ids = parseTdids();
+    log(`Nájdených ID: ${ids.length}`, ids.length ? 'warn' : 'err');
 
-  for (let i = 0; i < ids.length; i++) {
-    const tdid = ids[i];
-    try {
-      log(`[${i+1}/${ids.length}] ${tdid}...`);
-      const raw  = await fetchOne(tdid);
-      const slim = toSlim(raw, tdid);
-      resultData.push(slim);
-      log(`  ✓ ${slim.title || tdid} (${slim.entry_list.length} hráčov)`, 'ok');
-    } catch(e) {
-      log(`  ✗ ${tdid}: ${e.message}`, 'err');
+    if (!ids.length) {
+      log('⚠ Žiadne platné ID sa nenašlo. Skontroluj formát linkov.', 'err');
+      log('Očakávaný formát: season.php?id=t_XXXX_1234  alebo  t_XXXX_1234', 'warn');
+      return;
     }
-    setBar(i+1, ids.length);
-    await new Promise(r => setTimeout(r, 250));
-  }
 
-  resultData.sort((a, b) => a.t_date - b.t_date);
-  document.getElementById('fetchBtn').disabled = false;
-  showOutput();
+    document.getElementById('out-card').style.display  = 'none';
+    document.getElementById('fetchBtn').disabled = true;
+    resultData = [];
+    setBar(0, ids.length);
+    log(`Spúšťam fetch pre ${ids.length} kôl...`, 'warn');
+
+    for (let i = 0; i < ids.length; i++) {
+      const tdid = ids[i];
+      try {
+        log(`[${i+1}/${ids.length}] ${tdid}...`);
+        const raw  = await fetchOne(tdid);
+        const slim = toSlim(raw, tdid);
+        resultData.push(slim);
+        log(`  ✓ ${slim.title || tdid} (${slim.entry_list.length} hráčov)`, 'ok');
+      } catch(e) {
+        log(`  ✗ ${tdid}: ${e.message}`, 'err');
+      }
+      setBar(i+1, ids.length);
+      await new Promise(r => setTimeout(r, 250));
+    }
+
+    resultData.sort((a, b) => a.t_date - b.t_date);
+    document.getElementById('fetchBtn').disabled = false;
+    showOutput();
+  } catch(fatal) {
+    alert('Chyba JS: ' + fatal.message + '\n\n' + fatal.stack);
+  }
 }
 
 function showOutput() {
