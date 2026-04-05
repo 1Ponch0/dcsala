@@ -203,14 +203,14 @@ function showOutput() {
   document.getElementById('output').value = JSON.stringify(resultData, null, 2);
   document.getElementById('dlLabel').textContent = fn;
   document.getElementById('dataJsHint').textContent = '// v data.js → LOCAL_SEASON_FILES pridaj:\n"jsons/' + fn + '",';
-  document.getElementById('result-section').style.display = '';
+  document.getElementById('result-section').style.display = 'block';
 }
 
 function startFetch() {
   var ids = parseTdids();
 
-  document.getElementById('progress-section').style.display = '';
-  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none'; /* skryť */
   document.getElementById('log').innerHTML = '';
 
   if (!ids.length) {
