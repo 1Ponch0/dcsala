@@ -144,7 +144,7 @@
 
     /* Drawer sections */
     .drawer-section {
-      padding: 8px 0;
+      padding: 4px 0;
       border-bottom: 1px solid var(--stroke);
     }
     .drawer-section:last-child { border-bottom: none; }
@@ -158,15 +158,16 @@
       text-transform: uppercase;
     }
 
+    /* ── DRAWER ITEM (podpoložky) ── */
     .drawer-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 11px 20px 11px 28px;
+      padding: 9px 16px 9px 36px;
       cursor: pointer;
       color: var(--muted);
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 400;
       border: none;
       background: none;
       width: 100%;
@@ -174,72 +175,78 @@
       transition: background 0.15s, color 0.15s;
       border-radius: 0;
     }
-    .drawer-item:hover { background: rgba(255,255,255,0.04); }
+    .drawer-item:hover { background: rgba(255,255,255,0.04); color: var(--ink); }
     .drawer-item.active {
-      color: var(--ink);
-      background: rgba(209,0,58,0.12);
+      color: var(--accentR);
+      background: rgba(209,0,58,0.10);
       border-left: 3px solid var(--accentR);
-      padding-left: 25px;
+      padding-left: 33px;
     }
     .drawer-item svg {
-      width: 16px; height: 16px;
+      width: 14px; height: 14px;
       stroke: currentColor; fill: none; stroke-width: 1.8;
-      flex-shrink: 0;
+      flex-shrink: 0; opacity: 0.7;
     }
 
+    /* ── DRAWER PARENT (hlavné sekcie – nerozbaľovacie) ── */
     .drawer-parent {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 11px 20px;
-      font-size: 13px;
+      padding: 10px 16px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--ink);
-      letter-spacing: 0.5px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.03);
+      border-top: 1px solid var(--stroke);
+      margin-top: 2px;
+      cursor: default;
     }
     .drawer-parent svg {
-      width: 16px; height: 16px;
+      width: 13px; height: 13px;
       stroke: currentColor; fill: none; stroke-width: 1.8;
       flex-shrink: 0;
     }
 
-    /* ── COLLAPSIBLE GROUP ── */
+    /* ── COLLAPSIBLE GROUP TOGGLE (hlavné rozbaľovacie) ── */
     .drawer-group-toggle {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 9px 20px 9px 20px;
+      padding: 11px 16px;
       cursor: pointer;
       color: var(--ink);
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       border: none;
       background: none;
       width: 100%;
       text-align: left;
       transition: background 0.15s;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
     .drawer-group-toggle:hover { background: rgba(255,255,255,0.04); }
     .drawer-group-toggle.active {
-      color: var(--ink);
-      background: rgba(209,0,58,0.12);
+      color: var(--accentR);
+      background: rgba(209,0,58,0.10);
       border-left: 3px solid var(--accentR);
-      padding-left: 17px;
+      padding-left: 13px;
     }
-    .drawer-group-toggle .gtitle { display: flex; align-items: center; gap: 8px; }
-    .drawer-group-toggle svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+    .drawer-group-toggle .gtitle { display: flex; align-items: center; gap: 10px; }
+    .drawer-group-toggle .gtitle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
     .drawer-group-toggle .chevron {
-      width: 14px; height: 14px;
+      width: 13px; height: 13px;
       transition: transform 0.2s;
-      flex-shrink: 0;
+      flex-shrink: 0; opacity: 0.5;
     }
     .drawer-group-toggle.open .chevron { transform: rotate(180deg); }
 
     .drawer-group-items {
       max-height: 0;
       overflow: hidden;
-      padding-left: 8px;
+      background: rgba(0,0,0,0.15);
       transition: max-height 0.25s ease;
     }
     .drawer-group-items.open { max-height: 400px; }
@@ -552,9 +559,11 @@
     </div>
 
     <div class="drawer-section">
-      <button class="drawer-item active" id="nav-home" onclick="navTo('home',null,this)">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Domov
+      <button class="drawer-group-toggle active" id="nav-home" onclick="navTo('home',null,this)" style="font-size:15px;">
+        <span class="gtitle">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Domov
+        </span>
       </button>
     </div>
 
