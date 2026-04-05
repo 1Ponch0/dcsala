@@ -249,7 +249,7 @@ async function startFetch() {
 function showOutput() {
   const outCard = document.getElementById('out-card');
   outCard.style.display = '';
-  outCard.scrollIntoView({ behavior: 'smooth' });
+  outCard.scrollIntoView({ behavior: 'instant' });
   const fn      = getFilename();
   const players = new Set(resultData.flatMap(r => r.entry_list.map(p => p.name)));
 
