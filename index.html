@@ -563,35 +563,62 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Aktuálna sezóna
       </div>
-      <div class="drawer-section-title">1. Liga</div>
-      <button class="drawer-item" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
-        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Tabuľka
+      <!-- 1. Liga toggle -->
+      <button class="drawer-group-toggle" id="grp-prva" onclick="toggleGroup('prva')">
+        <span class="gtitle">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          1. Liga
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <button class="drawer-item" id="nav-prva-stats" onclick="navTo('prva','stats',this)">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Štatistiky
-      </button>
+      <div class="drawer-group-items" id="grpitems-prva">
+        <button class="drawer-item" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Tabuľka
+        </button>
+        <button class="drawer-item" id="nav-prva-stats" onclick="navTo('prva','stats',this)">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Štatistiky
+        </button>
+      </div>
 
-      <div class="drawer-section-title" style="margin-top:6px">Open liga</div>
-      <button class="drawer-item" id="nav-open-rank" onclick="navTo('open','rank',this)">
-        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Tabuľka
+      <!-- Open liga toggle -->
+      <button class="drawer-group-toggle" id="grp-open" onclick="toggleGroup('open')">
+        <span class="gtitle">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Open liga
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <button class="drawer-item" id="nav-open-stats" onclick="navTo('open','stats',this)">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Štatistiky
-      </button>
+      <div class="drawer-group-items" id="grpitems-open">
+        <button class="drawer-item" id="nav-open-rank" onclick="navTo('open','rank',this)">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Tabuľka
+        </button>
+        <button class="drawer-item" id="nav-open-stats" onclick="navTo('open','stats',this)">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Štatistiky
+        </button>
+      </div>
 
-      <div class="drawer-section-title" style="margin-top:6px">Ženská liga</div>
-      <button class="drawer-item" id="nav-zenska-rank" onclick="navTo('zenska','rank',this)">
-        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Tabuľka
+      <!-- Ženská liga toggle -->
+      <button class="drawer-group-toggle" id="grp-zenska" onclick="toggleGroup('zenska')">
+        <span class="gtitle">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>
+          Ženská liga
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <button class="drawer-item" id="nav-zenska-stats" onclick="navTo('zenska','stats',this)">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Štatistiky
-      </button>
+      <div class="drawer-group-items" id="grpitems-zenska">
+        <button class="drawer-item" id="nav-zenska-rank" onclick="navTo('zenska','rank',this)">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Tabuľka
+        </button>
+        <button class="drawer-item" id="nav-zenska-stats" onclick="navTo('zenska','stats',this)">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Štatistiky
+        </button>
+      </div>
     </div>
 
     <div class="drawer-section">
