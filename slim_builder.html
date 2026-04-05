@@ -206,13 +206,10 @@ async function fetchOne(tdid) {
 async function startFetch() {
   try {
     const progCard = document.getElementById('prog-card');
-    const logEl    = document.getElementById('log');
     progCard.style.display = '';
-    logEl.innerHTML = '';
     progCard.scrollIntoView({ behavior: 'smooth' });
-
+    document.getElementById('log').innerHTML = '';
     const ids = parseTdids();
-    log(`Nájdených ID: ${ids.length}`, ids.length ? 'warn' : 'err');
 
     if (!ids.length) {
       log('⚠ Žiadne platné ID sa nenašlo. Skontroluj formát linkov.', 'err');
@@ -250,7 +247,9 @@ async function startFetch() {
 }
 
 function showOutput() {
-  document.getElementById('out-card').style.display = '';
+  const outCard = document.getElementById('out-card');
+  outCard.style.display = '';
+  outCard.scrollIntoView({ behavior: 'smooth' });
   const fn      = getFilename();
   const players = new Set(resultData.flatMap(r => r.entry_list.map(p => p.name)));
 
