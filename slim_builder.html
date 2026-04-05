@@ -81,7 +81,7 @@ t_96CX_4231
   </div>
 
   <div class="btns">
-    <button class="btn primary" id="fetchBtn" onclick="alert('klik OK'); startFetch();">⬇ Generovať JSON</button>
+    <button class="btn primary" id="fetchBtn" onclick="startFetch()">⬇ Generovať JSON</button>
     <button class="btn secondary" onclick="document.getElementById('ids').value=''">🗑 Vyčistiť</button>
   </div>
 
@@ -209,6 +209,7 @@ async function startFetch() {
     const logEl    = document.getElementById('log');
     progCard.style.display = '';
     logEl.innerHTML = '';
+    progCard.scrollIntoView({ behavior: 'smooth' });
 
     const ids = parseTdids();
     log(`Nájdených ID: ${ids.length}`, ids.length ? 'warn' : 'err');
