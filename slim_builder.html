@@ -185,17 +185,29 @@ function toSlim(raw, tdid) {
 }
 
 async function fetchOne(tdid) {
-  const proxy     = document.getElementById('proxy').value.trim();
+  const PROXY    = 'https://h2h.dartssala.workers.dev/?url=';
   const targetUrl = API + tdid;
-  const fetchUrl  = proxy ? proxy + encodeURIComponent(targetUrl) : targetUrl;
-  const r = await fetch(fetchUrl);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
+  // skús priamo, ak CORS zlyhá skús cez proxy
+  try {
+    const r = await fetch(targetUrl);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  } catch(_) {
+    const r2 = await fetch(PROXY + encodeURIComponent(targetUrl));
+    if (!r2.ok) throw new Error(`HTTP ${r2.status} (proxy)`);
+    return r2.json();
+  }
 }
 
 async function startFetch() {
   const ids = parseTdids();
-  if (!ids.length) { alert('Vlož aspoň 1 link alebo tdid!'); return; }
+  if (!ids.length) {
+    document.getElementById('prog-card').style.display = '';
+    document.getElementById('log').innerHTML = '';
+    log('⚠ Žiadne platné ID sa nenašlo. Skontroluj formát linkov.', 'err');
+    log('Očakávaný formát: season.php?id=t_XXXX_1234  alebo  t_XXXX_1234', 'warn');
+    return;
+  }
 
   document.getElementById('prog-card').style.display = '';
   document.getElementById('out-card').style.display  = 'none';
