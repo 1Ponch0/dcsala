@@ -17,39 +17,33 @@
   }
   .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
   .row .field { display: flex; flex-direction: column; gap: 4px; }
-  .row .field label { margin-bottom: 0; }
   .btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-family: monospace; font-size: 0.82rem; transition: opacity .15s; }
   .btn:hover { opacity: .85; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
   .primary  { background: #00d4ff; color: #1a1a2e; font-weight: bold; }
   .secondary{ background: #0f3460; color: #e0e0e0; border: 1px solid #1a4a8a; }
-  .green    { background: #00b894; color: #fff; font-weight: bold; }
-  .progress-wrap { margin-top: 10px; }
-  .bar-bg { background: #0a1628; border-radius: 4px; height: 8px; overflow: hidden; }
+  .green    { background: #00b894; color: #fff; font-weight: bold; font-size: 1rem; padding: 12px 24px; }
+  .bar-bg { background: #0a1628; border-radius: 4px; height: 8px; overflow: hidden; margin: 8px 0 4px; }
   .bar    { background: #00d4ff; height: 100%; width: 0; transition: width .25s; border-radius: 4px; }
-  .ptext  { font-size: 0.72rem; color: #888; margin-top: 4px; }
-  .log    { margin-top: 8px; max-height: 130px; overflow-y: auto; font-size: 0.73rem; }
+  .ptext  { font-size: 0.72rem; color: #888; }
+  .log    { margin-top: 8px; max-height: 160px; overflow-y: auto; font-size: 0.73rem; }
   .log div { padding: 1px 0; }
   .ok   { color: #00b894; }
   .err  { color: #ff6b6b; }
   .warn { color: #fdcb6e; }
-  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .hint { font-size: 0.7rem; color: #555; margin-top: 5px; }
+  .filename-preview { font-size: 0.78rem; color: #00b894; margin-top: 4px; margin-bottom: 10px; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
   .stat { background: #0a1628; border-radius: 4px; padding: 7px 12px; font-size: 0.78rem; }
   .stat span { color: #00d4ff; font-weight: bold; }
-  #out-card { display: none; }
-  #prog-card { display: none; }
-  .hint { font-size: 0.7rem; color: #555; margin-top: 5px; }
-  .cors-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  .cors-row input { flex: 1; }
-  .toggle { font-size: 0.72rem; color: #00d4ff; cursor: pointer; text-decoration: underline; }
-  #proxy-row { display: none; margin-top: 8px; }
-  .filename-preview { font-size: 0.78rem; color: #00b894; margin-top: 4px; }
   .code-block {
     background: #0a1628; border: 1px solid #1a4a8a; border-radius: 5px;
     padding: 10px; font-size: 0.75rem; color: #aad4ff; margin-top: 8px;
     white-space: pre-wrap; word-break: break-all;
   }
+  #result-section { display: none; margin-top: 16px; border-top: 1px solid #0f3460; padding-top: 16px; }
+  #progress-section { display: none; margin-top: 16px; border-top: 1px solid #0f3460; padding-top: 16px; }
 </style>
 </head>
 <body>
@@ -57,130 +51,114 @@
 <h1>🎯 DC Šaľa – Slim JSON Builder</h1>
 <p class="sub">Vlož linky na kolá → stiahni seasonXX_slim.json</p>
 
-<!-- ── VSTUP ── -->
 <div class="card">
+  <!-- Číslo sezóny -->
   <div class="row">
     <div class="field">
       <label>Číslo sezóny</label>
       <input type="number" id="seasonNum" value="16" min="1" max="99" style="width:80px" oninput="updateFilename()">
     </div>
     <div class="field" style="flex:1">
-      <label>Názov sezóny (voliteľný – pre suffix)</label>
+      <label>Suffix (voliteľný)</label>
       <input type="text" id="seasonSuffix" placeholder="napr. open  alebo  nechaj prázdne" style="width:100%" oninput="updateFilename()">
     </div>
   </div>
   <div class="filename-preview" id="fnPreview">📄 Súbor: season16_slim.json</div>
 
-  <div style="margin-top:12px">
-    <label>Linky na kolá (1 na riadok)</label>
-    <textarea id="ids" rows="10" placeholder="https://n01darts.com/n01/league/season.php?id=t_W5CJ_9466
+  <!-- Linky -->
+  <label>Linky na kolá (1 na riadok)</label>
+  <textarea id="ids" rows="8" placeholder="https://n01darts.com/n01/league/season.php?id=t_W5CJ_9466
 https://n01darts.com/n01/league/season.php?id=t_r17y_6493
-t_96CX_4231
-..."></textarea>
-    <p class="hint">Rozpozná: season.php?id= · ?tdid= · bare t_XXX_XXXX</p>
-  </div>
+t_96CX_4231"></textarea>
+  <p class="hint">Rozpozná: season.php?id= · ?tdid= · bare t_XXX_XXXX</p>
 
+  <!-- Tlačidlá -->
   <div class="btns">
     <button class="btn primary" id="fetchBtn" onclick="startFetch()">⬇ Generovať JSON</button>
     <button class="btn secondary" onclick="document.getElementById('ids').value=''">🗑 Vyčistiť</button>
   </div>
 
-  <div id="proxy-row">
-    <div class="cors-row">
-      <input type="text" id="proxy" value="https://h2h.dartssala.workers.dev/?url=">
-      <button class="btn secondary" onclick="document.getElementById('proxy').value='https://corsproxy.io/?'">Reset</button>
-    </div>
-    <p class="hint">Proxy sa použije len ak priamy fetch zlyhá na CORS.</p>
-  </div>
-  <div style="margin-top:8px"><span class="toggle" onclick="toggleProxy()">⚙ Nastavenia proxy</span></div>
-</div>
-
-<!-- ── PRIEBEH ── -->
-<div class="card" id="prog-card">
-  <label>Priebeh</label>
-  <div class="progress-wrap">
+  <!-- Priebeh – priamo v karte -->
+  <div id="progress-section">
+    <label>Priebeh</label>
     <div class="bar-bg"><div class="bar" id="bar"></div></div>
     <div class="ptext" id="ptext">0 / 0</div>
-  </div>
-  <div class="log" id="log"></div>
-</div>
-
-<!-- ── VÝSLEDOK ── -->
-<div class="card" id="out-card">
-  <label>Výsledok</label>
-  <div class="stats" id="stats"></div>
-  <textarea id="output" rows="12" readonly></textarea>
-  <div class="btns">
-    <button class="btn green" onclick="downloadJSON()">⬇ Stiahnuť <span id="dlLabel">season16_slim.json</span></button>
-    <button class="btn secondary" onclick="copyJSON()">📋 Kopírovať</button>
+    <div class="log" id="log"></div>
   </div>
 
-  <div style="margin-top:14px">
-    <label>Pridaj do data.js → LOCAL_SEASON_FILES</label>
-    <div class="code-block" id="dataJsHint"></div>
+  <!-- Výsledok – priamo v karte -->
+  <div id="result-section">
+    <label style="color:#00b894; font-size:0.9rem;">✓ Hotovo!</label>
+    <div class="stats" id="stats"></div>
+    <div class="btns">
+      <button class="btn green" onclick="downloadJSON()">⬇ Stiahnuť <span id="dlLabel">season16_slim.json</span></button>
+      <button class="btn secondary" onclick="copyJSON()">📋 Kopírovať</button>
+    </div>
+    <div style="margin-top:10px">
+      <label>Pridaj do data.js → LOCAL_SEASON_FILES</label>
+      <div class="code-block" id="dataJsHint"></div>
+    </div>
+    <div style="margin-top:10px">
+      <label>JSON náhľad</label>
+      <textarea id="output" rows="8" readonly></textarea>
+    </div>
   </div>
 </div>
 
 <script>
-window.onerror = function(msg, src, line, col, err) {
-  alert('JS chyba:\n' + msg + '\nRiadok: ' + line + '\n' + (err ? err.stack : ''));
-};
-
 const API = 'https://api.n01darts.com/n01/tournament/n01_tournament.php?cmd=get_data&tdid=';
 let resultData = [];
 
 function getFilename() {
-  const num  = document.getElementById('seasonNum').value.trim() || '?';
-  const suf  = document.getElementById('seasonSuffix').value.trim();
-  return suf ? `season${num}_${suf}_slim.json` : `season${num}_slim.json`;
+  const num = document.getElementById('seasonNum').value.trim() || '?';
+  const suf = document.getElementById('seasonSuffix').value.trim();
+  return suf ? 'season' + num + '_' + suf + '_slim.json' : 'season' + num + '_slim.json';
 }
 
 function updateFilename() {
-  const fn = getFilename();
+  var fn = getFilename();
   document.getElementById('fnPreview').textContent = '📄 Súbor: ' + fn;
-  document.getElementById('dlLabel').textContent   = fn;
-}
-
-function toggleProxy() {
-  const r = document.getElementById('proxy-row');
-  r.style.display = r.style.display === 'none' ? '' : 'none';
+  document.getElementById('dlLabel').textContent = fn;
 }
 
 function parseTdids() {
-  const lines = document.getElementById('ids').value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
-  const seen = new Set();
-  lines.forEach(l => {
-    let m;
-    if ((m = l.match(/[?&]id=(t_[A-Za-z0-9_]+)/)))   seen.add(m[1]);
-    else if ((m = l.match(/tdid=(t_[A-Za-z0-9_]+)/))) seen.add(m[1]);
-    else if (/^t_[A-Za-z0-9_]+$/.test(l))             seen.add(l);
+  var lines = document.getElementById('ids').value.split(/[\n,]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+  var seen = [];
+  var set = {};
+  lines.forEach(function(l) {
+    var m;
+    if ((m = l.match(/[?&]id=(t_[A-Za-z0-9_]+)/)))   { if (!set[m[1]]) { set[m[1]] = 1; seen.push(m[1]); } }
+    else if ((m = l.match(/tdid=(t_[A-Za-z0-9_]+)/))) { if (!set[m[1]]) { set[m[1]] = 1; seen.push(m[1]); } }
+    else if (/^t_[A-Za-z0-9_]+$/.test(l))             { if (!set[l])    { set[l] = 1;    seen.push(l); } }
   });
-  return [...seen];
+  return seen;
 }
 
-function log(msg, cls='') {
-  const el = document.getElementById('log');
-  const d  = document.createElement('div');
-  d.className = cls; d.textContent = msg;
-  el.appendChild(d); el.scrollTop = el.scrollHeight;
+function log(msg, cls) {
+  var el = document.getElementById('log');
+  var d = document.createElement('div');
+  d.className = cls || '';
+  d.textContent = msg;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
 }
 
 function setBar(done, total) {
-  document.getElementById('bar').style.width = (total ? done/total*100 : 0) + '%';
-  document.getElementById('ptext').textContent = `${done} / ${total}`;
+  document.getElementById('bar').style.width = (total ? done / total * 100 : 0) + '%';
+  document.getElementById('ptext').textContent = done + ' / ' + total;
 }
 
 function toSlim(raw, tdid) {
-  const t = raw.tournament || raw;
+  var t = raw.tournament || raw;
   return {
-    tdid:       t.tdid       || tdid,
-    title:      t.title      || '',
-    t_date:     t.t_date     || 0,
-    s_date:     t.s_date     || 0,
-    entry_list: (t.entry_list || []).map(p => {
-      const s = { tpid: p.tpid, name: p.name };
+    tdid:       t.tdid || tdid,
+    title:      t.title || '',
+    t_date:     t.t_date || 0,
+    s_date:     t.s_date || 0,
+    entry_list: (t.entry_list || []).map(function(p) {
+      var s = { tpid: p.tpid, name: p.name };
       if (p.sns_type) s.sns_type = p.sns_type;
-      if (p.c)        s.c = p.c;
+      if (p.c) s.c = p.c;
       return s;
     }),
     rr_result: raw.rr_result || t.rr_result || {},
@@ -188,95 +166,102 @@ function toSlim(raw, tdid) {
   };
 }
 
-async function fetchOne(tdid) {
-  const PROXY    = 'https://h2h.dartssala.workers.dev/?url=';
-  const targetUrl = API + tdid;
-  // skús priamo, ak CORS zlyhá skús cez proxy
-  try {
-    const r = await fetch(targetUrl);
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  } catch(_) {
-    const r2 = await fetch(PROXY + encodeURIComponent(targetUrl));
-    if (!r2.ok) throw new Error(`HTTP ${r2.status} (proxy)`);
-    return r2.json();
-  }
+function fetchOne(tdid) {
+  var PROXY = 'https://h2h.dartssala.workers.dev/?url=';
+  var targetUrl = API + tdid;
+  return fetch(targetUrl)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .catch(function() {
+      return fetch(PROXY + encodeURIComponent(targetUrl))
+        .then(function(r2) {
+          if (!r2.ok) throw new Error('HTTP ' + r2.status + ' (proxy)');
+          return r2.json();
+        });
+    });
 }
 
-async function startFetch() {
-  try {
-    const progCard = document.getElementById('prog-card');
-    progCard.style.display = '';
-    progCard.scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('log').innerHTML = '';
-    const ids = parseTdids();
-
-    if (!ids.length) {
-      log('⚠ Žiadne platné ID sa nenašlo. Skontroluj formát linkov.', 'err');
-      log('Očakávaný formát: season.php?id=t_XXXX_1234  alebo  t_XXXX_1234', 'warn');
-      return;
-    }
-
-    document.getElementById('out-card').style.display  = 'none';
-    document.getElementById('fetchBtn').disabled = true;
-    resultData = [];
-    setBar(0, ids.length);
-    log(`Spúšťam fetch pre ${ids.length} kôl...`, 'warn');
-
-    for (let i = 0; i < ids.length; i++) {
-      const tdid = ids[i];
-      try {
-        log(`[${i+1}/${ids.length}] ${tdid}...`);
-        const raw  = await fetchOne(tdid);
-        const slim = toSlim(raw, tdid);
-        resultData.push(slim);
-        log(`  ✓ ${slim.title || tdid} (${slim.entry_list.length} hráčov)`, 'ok');
-      } catch(e) {
-        log(`  ✗ ${tdid}: ${e.message}`, 'err');
-      }
-      setBar(i+1, ids.length);
-      await new Promise(r => setTimeout(r, 250));
-    }
-
-    resultData.sort((a, b) => a.t_date - b.t_date);
-    document.getElementById('fetchBtn').disabled = false;
-    showOutput();
-  } catch(fatal) {
-    alert('Chyba JS: ' + fatal.message + '\n\n' + fatal.stack);
-  }
+function delay(ms) {
+  return new Promise(function(resolve) { setTimeout(resolve, ms); });
 }
 
 function showOutput() {
-  const outCard = document.getElementById('out-card');
-  outCard.style.display = '';
-  outCard.scrollIntoView({ behavior: 'instant' });
-  const fn      = getFilename();
-  const players = new Set(resultData.flatMap(r => r.entry_list.map(p => p.name)));
+  var fn = getFilename();
+  var players = {};
+  resultData.forEach(function(r) {
+    (r.entry_list || []).forEach(function(p) { players[p.name] = 1; });
+  });
+  var playerCount = Object.keys(players).length;
 
-  document.getElementById('stats').innerHTML = `
-    <div class="stat">Kôl: <span>${resultData.length}</span></div>
-    <div class="stat">Hráčov: <span>${players.size}</span></div>
-    <div class="stat">Veľkosť: <span>~${Math.round(JSON.stringify(resultData).length/1024)} KB</span></div>
-  `;
+  document.getElementById('stats').innerHTML =
+    '<div class="stat">Kôl: <span>' + resultData.length + '</span></div>' +
+    '<div class="stat">Hráčov: <span>' + playerCount + '</span></div>' +
+    '<div class="stat">Veľkosť: <span>~' + Math.round(JSON.stringify(resultData).length / 1024) + ' KB</span></div>';
+
   document.getElementById('output').value = JSON.stringify(resultData, null, 2);
   document.getElementById('dlLabel').textContent = fn;
+  document.getElementById('dataJsHint').textContent = '// v data.js → LOCAL_SEASON_FILES pridaj:\n"jsons/' + fn + '",';
+  document.getElementById('result-section').style.display = '';
+}
 
-  // hint pre data.js
-  document.getElementById('dataJsHint').textContent =
-    `// v data.js → LOCAL_SEASON_FILES pridaj:\n"jsons/${fn}",`;
+function startFetch() {
+  var ids = parseTdids();
+
+  document.getElementById('progress-section').style.display = '';
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('log').innerHTML = '';
+
+  if (!ids.length) {
+    log('⚠ Žiadne platné ID. Skontroluj formát linkov.', 'err');
+    return;
+  }
+
+  document.getElementById('fetchBtn').disabled = true;
+  resultData = [];
+  setBar(0, ids.length);
+  log('Spúšťam ' + ids.length + ' kôl...', 'warn');
+
+  var i = 0;
+  function next() {
+    if (i >= ids.length) {
+      resultData.sort(function(a, b) { return a.t_date - b.t_date; });
+      document.getElementById('fetchBtn').disabled = false;
+      showOutput();
+      return;
+    }
+    var tdid = ids[i];
+    log('[' + (i + 1) + '/' + ids.length + '] ' + tdid + '...');
+    fetchOne(tdid)
+      .then(function(raw) {
+        var slim = toSlim(raw, tdid);
+        resultData.push(slim);
+        log('  ✓ ' + (slim.title || tdid) + ' (' + slim.entry_list.length + ' hráčov)', 'ok');
+      })
+      .catch(function(e) {
+        log('  ✗ ' + tdid + ': ' + e.message, 'err');
+      })
+      .then(function() {
+        setBar(i + 1, ids.length);
+        i++;
+        setTimeout(next, 250);
+      });
+  }
+  next();
 }
 
 function downloadJSON() {
-  const blob = new Blob([JSON.stringify(resultData, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
+  var blob = new Blob([JSON.stringify(resultData, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = getFilename();
   a.click();
 }
 
 function copyJSON() {
-  navigator.clipboard.writeText(document.getElementById('output').value)
-    .then(() => alert('Skopírované!'));
+  var text = document.getElementById('output').value;
+  navigator.clipboard.writeText(text).then(function() { alert('Skopírované!'); });
 }
 </script>
 </body>
