@@ -657,10 +657,14 @@
     </div>
 
     <div class="drawer-section">
-      <div class="drawer-parent">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Štatistiky
-      </div>
+      <button class="drawer-group-toggle" id="grp-stats" onclick="toggleGroup('stats')">
+        <span class="gtitle">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Štatistiky
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="drawer-group-items" id="grpitems-stats">
       <button class="drawer-item" id="nav-h2h" onclick="navTo('h2h',null,this)">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         H2H
@@ -673,6 +677,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         JSON Builder
       </a>
+      </div>
     </div>
   </nav>
 
