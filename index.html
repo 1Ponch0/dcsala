@@ -876,6 +876,13 @@
       return new Date(ms).toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
+    const T_DETAIL_BASE = 'https://api.n01darts.com/n01/tournament/n01_tournament.php?cmd=get_data&tdid=';
+
+    function roundNum(title) {
+      const m = title.match(/(\d+)\.\s*[Kk]olo/);
+      return m ? parseInt(m[1]) : 0;
+    }
+
     async function loadHomeData() {
       for (const lg of HOME_LEAGUES) {
         const card = document.getElementById('home-card-' + lg.key);
@@ -885,20 +892,65 @@
           const data = await res.json();
 
           const now = Date.now();
-          const TWO_DAYS = 2 * 24 * 3600 * 1000;
           const rounds = Object.entries(data).map(([tdid, t]) => ({
             tdid,
             title: t.title,
             createTime: t.createTime,
             updateTime: t.updateTime,
-            played: (t.updateTime / 1000 - t.createTime) > 300
-                 && (now - t.updateTime) > TWO_DAYS
+            num: roundNum(t.title),
+            touched: (t.updateTime / 1000 - t.createTime) > 300
           }));
 
-          const played   = rounds.filter(r => r.played).sort((a, b) => b.updateTime - a.updateTime);
-          const upcoming = rounds.filter(r => !r.played).sort((a, b) => a.createTime - b.createTime);
-          const last = played[0];
-          const next = upcoming[0];
+          // touched = diff > 300s (odohrate alebo otvorena registracia)
+          const touched = rounds.filter(r => r.touched).sort((a, b) => b.num - a.num);
+
+          let last = null;
+          let next = null;
+
+          if (touched.length === 0) {
+            // ziadne kolá ešte neboli dotknuté
+            const allByNum = rounds.sort((a, b) => a.num - b.num);
+            next = allByNum[0] || null;
+          } else {
+            // fetchni top 2 touched podla cisla kola pre status
+            const candidates = touched.slice(0, 2);
+            const details = await Promise.allSettled(
+              candidates.map(async r => {
+                const res = await fetch(T_DETAIL_BASE + r.tdid);
+                if (!res.ok) throw new Error('chyba');
+                const d = await res.json();
+                return { ...r, status: d.status };
+              })
+            );
+
+            const withStatus = details
+              .filter(r => r.status === 'fulfilled')
+              .map(r => r.value);
+
+            // status 40 = zatvorene/odohrate
+            const playedCandidates  = withStatus.filter(r => r.status === 40);
+            const upcomingCandidates = withStatus.filter(r => r.status !== 40);
+
+            if (upcomingCandidates.length > 0) {
+              // najvyssie cislo touched ktore nie je odohrate = upcoming
+              next = upcomingCandidates.sort((a, b) => b.num - a.num)[0];
+              // posledne odohrate = najvyssie cislo zo vsetkych touched so status 40
+              const allPlayed = touched.filter(r => {
+                const found = withStatus.find(w => w.tdid === r.tdid);
+                if (found) return found.status === 40;
+                return true; // ostatne touched (nie top 2) predpokladame odohrate
+              });
+              last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
+            } else {
+              // oba top 2 su odohrate
+              last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
+              // upcoming = prve untouched kolo s vyssim cislom
+              const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
+              next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
+            }
+          }
+
+          const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
 
           const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
           let html = '<div class="home-rounds">';
