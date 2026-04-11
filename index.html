@@ -932,8 +932,8 @@
             const upcomingCandidates = withStatus.filter(r => r.status !== 40);
 
             if (upcomingCandidates.length > 0) {
-              // najvyssie cislo touched ktore nie je odohrate = upcoming
-              next = upcomingCandidates.sort((a, b) => b.num - a.num)[0];
+              // najnizsie cislo touched ktore nie je odohrate = upcoming
+              next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
               // posledne odohrate = najvyssie cislo zo vsetkych touched so status 40
               const allPlayed = touched.filter(r => {
                 const found = withStatus.find(w => w.tdid === r.tdid);
