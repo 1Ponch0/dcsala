@@ -1,4 +1,4 @@
-const CACHE = "dcsala-v1";
+const CACHE = "dcsala-v2";
 const ASSETS = [
   "/dcsala/",
   "/dcsala/index.html",
