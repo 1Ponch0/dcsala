@@ -903,7 +903,7 @@
             createTime: t.createTime,
             updateTime: t.updateTime,
             num: roundNum(t.title),
-            touched: (t.updateTime / 1000 - t.createTime) > 300
+            touched: (t.updateTime / 1000 - t.createTime) > 3600
           }));
 
           // touched = diff > 300s (odohrate alebo otvorena registracia)
