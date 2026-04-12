@@ -888,123 +888,114 @@
       return m ? parseInt(m[1]) : 0;
     }
 
-    async function loadHomeData() {
-      for (const lg of HOME_LEAGUES) {
-        const card = document.getElementById('home-card-' + lg.key);
-        try {
-          const url = T_LIST_BASE + lg.id;
-          const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-          const data = await res.json();
-
-          const now = Date.now();
-          const rounds = Object.entries(data).map(([tdid, t]) => ({
-            tdid,
-            title: t.title,
-            createTime: t.createTime,
-            updateTime: t.updateTime,
-            num: roundNum(t.title),
-            touched: (t.updateTime / 1000 - t.createTime) > 3600
-          }));
-
-          // touched = diff > 300s (odohrate alebo otvorena registracia)
-          const touched = rounds.filter(r => r.touched).sort((a, b) => b.num - a.num);
-
-          let last = null;
-          let next = null;
-
-          if (touched.length === 0) {
-            // ziadne kolá ešte neboli dotknuté
-            const allByNum = rounds.sort((a, b) => a.num - b.num);
-            next = allByNum[0] || null;
-          } else {
-            // fetchni top 2 touched podla cisla kola pre status
-            const candidates = touched.slice(0, 2);
-
-            async function fetchWithTimeout(url) {
-              const ctrl = new AbortController();
-              const tid = setTimeout(() => ctrl.abort(), 4000);
-              try {
-                const res = await fetch(url, { signal: ctrl.signal });
-                clearTimeout(tid);
-                if (!res.ok) throw new Error();
-                return await res.json();
-              } catch {
-                clearTimeout(tid);
-                return null;
-              }
-            }
-
-            async function fetchStatus(tdid) {
-              const d = await fetchWithTimeout(T_DETAIL_BASE + tdid)
-                     ?? await fetchWithTimeout(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
-              return d?.status ?? null;
-            }
-
-            const details = await Promise.allSettled(
-              candidates.map(async r => {
-                const status = await fetchStatus(r.tdid);
-                if (status === null) throw new Error('chyba');
-                return { ...r, status };
-              })
-            );
-
-            const withStatus = details
-              .filter(r => r.status === 'fulfilled')
-              .map(r => r.value);
-
-            // status 40 = zatvorene/odohrate
-            const playedCandidates  = withStatus.filter(r => r.status === 40);
-            const upcomingCandidates = withStatus.filter(r => r.status !== 40);
-
-            if (upcomingCandidates.length > 0) {
-              // najnizsie cislo touched ktore nie je odohrate = upcoming
-              next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
-              // posledne odohrate = najvyssie cislo zo vsetkych touched so status 40
-              const allPlayed = touched.filter(r => {
-                const found = withStatus.find(w => w.tdid === r.tdid);
-                if (found) return found.status === 40;
-                return true; // ostatne touched (nie top 2) predpokladame odohrate
-              });
-              last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
-            } else {
-              // oba top 2 su odohrate
-              last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
-              // upcoming = prve untouched kolo s vyssim cislom
-              const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
-              next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
-            }
-          }
-
-          const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
-          let html = '<div class="home-rounds">';
-          if (last) {
-            html += `<a class="home-round played clickable" href="${tournamentUrl(last.tdid)}" target="_blank" rel="noopener">
-              <div class="hr-label">Posledné kolo</div>
-              <div class="hr-title">${last.title}</div>
-              <div class="hr-date">${fmtDate(last.updateTime)} →</div>
-            </a>`;
-          }
-          if (next) {
-            html += `<a class="home-round upcoming clickable" href="${tournamentUrl(next.tdid)}" target="_blank" rel="noopener">
-              <div class="hr-label">Ďalšie kolo</div>
-              <div class="hr-title">${next.title}</div>
-              <div class="hr-date">Prihlásiť sa →</div>
-            </a>`;
-          } else {
-            html += `<div class="home-round upcoming">
-              <div class="hr-label">Ďalšie kolo</div>
-              <div class="hr-title">Čoskoro</div>
-              <div class="hr-date">—</div>
-            </div>`;
-          }
-          html += '</div>';
-
-          card.querySelector('.home-rounds').outerHTML = html;
-        } catch (e) {
-          card.querySelector('.home-rounds').innerHTML =
-            '<div class="home-round-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
-        }
+    async function fetchWithTimeout(url) {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 4000);
+      try {
+        const res = await fetch(url, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!res.ok) throw new Error();
+        return await res.json();
+      } catch {
+        clearTimeout(tid);
+        return null;
       }
+    }
+
+    async function fetchStatus(tdid) {
+      const d = await fetchWithTimeout(T_DETAIL_BASE + tdid)
+             ?? await fetchWithTimeout(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
+      return d?.status ?? null;
+    }
+
+    async function loadOneLeague(lg) {
+      const card = document.getElementById('home-card-' + lg.key);
+      if (!card) return;
+      try {
+        const url = T_LIST_BASE + lg.id;
+        const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+        const data = await res.json();
+
+        const now = Date.now();
+        const rounds = Object.entries(data).map(([tdid, t]) => ({
+          tdid,
+          title: t.title,
+          createTime: t.createTime,
+          updateTime: t.updateTime,
+          num: roundNum(t.title),
+          touched: (t.updateTime / 1000 - t.createTime) > 3600
+        }));
+
+        const touched = rounds.filter(r => r.touched).sort((a, b) => b.num - a.num);
+        let last = null;
+        let next = null;
+
+        if (touched.length === 0) {
+          next = rounds.sort((a, b) => a.num - b.num)[0] || null;
+        } else {
+          const candidates = touched.slice(0, 2);
+          const details = await Promise.allSettled(
+            candidates.map(async r => {
+              const status = await fetchStatus(r.tdid);
+              if (status === null) throw new Error('chyba');
+              return { ...r, status };
+            })
+          );
+
+          const withStatus = details
+            .filter(r => r.status === 'fulfilled')
+            .map(r => r.value);
+
+          const playedCandidates   = withStatus.filter(r => r.status === 40);
+          const upcomingCandidates = withStatus.filter(r => r.status !== 40);
+
+          if (upcomingCandidates.length > 0) {
+            next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
+            const allPlayed = touched.filter(r => {
+              const found = withStatus.find(w => w.tdid === r.tdid);
+              if (found) return found.status === 40;
+              return true;
+            });
+            last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
+          } else {
+            last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
+            const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
+            next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
+          }
+        }
+
+        const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
+        let html = '<div class="home-rounds">';
+        if (last) {
+          html += `<a class="home-round played clickable" href="${tournamentUrl(last.tdid)}" target="_blank" rel="noopener">
+            <div class="hr-label">Posledné kolo</div>
+            <div class="hr-title">${last.title}</div>
+            <div class="hr-date">${fmtDate(last.updateTime)} →</div>
+          </a>`;
+        }
+        if (next) {
+          html += `<a class="home-round upcoming clickable" href="${tournamentUrl(next.tdid)}" target="_blank" rel="noopener">
+            <div class="hr-label">Ďalšie kolo</div>
+            <div class="hr-title">${next.title}</div>
+            <div class="hr-date">Prihlásiť sa →</div>
+          </a>`;
+        } else {
+          html += `<div class="home-round upcoming">
+            <div class="hr-label">Ďalšie kolo</div>
+            <div class="hr-title">Čoskoro</div>
+            <div class="hr-date">—</div>
+          </div>`;
+        }
+        html += '</div>';
+        card.querySelector('.home-rounds').outerHTML = html;
+      } catch (e) {
+        card.querySelector('.home-rounds').innerHTML =
+          '<div class="home-round-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
+      }
+    }
+
+    async function loadHomeData() {
+      await Promise.allSettled(HOME_LEAGUES.map(lg => loadOneLeague(lg)));
     }
 
     function toggleDrawer() {
