@@ -919,12 +919,32 @@
           } else {
             // fetchni top 2 touched podla cisla kola pre status
             const candidates = touched.slice(0, 2);
+
+            async function fetchStatus(tdid) {
+              const ctrl = new AbortController();
+              const tid = setTimeout(() => ctrl.abort(), 4000);
+              try {
+                const res = await fetch(T_DETAIL_BASE + tdid, { signal: ctrl.signal });
+                clearTimeout(tid);
+                if (!res.ok) throw new Error();
+                const d = await res.json();
+                return d.status;
+              } catch {
+                clearTimeout(tid);
+                try {
+                  const res2 = await fetch(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
+                  if (!res2.ok) throw new Error();
+                  const d2 = await res2.json();
+                  return d2.status;
+                } catch { return null; }
+              }
+            }
+
             const details = await Promise.allSettled(
               candidates.map(async r => {
-                const res = await fetch(T_DETAIL_BASE + r.tdid);
-                if (!res.ok) throw new Error('chyba');
-                const d = await res.json();
-                return { ...r, status: d.status };
+                const status = await fetchStatus(r.tdid);
+                if (status === null) throw new Error('chyba');
+                return { ...r, status };
               })
             );
 
