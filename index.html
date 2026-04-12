@@ -708,6 +708,10 @@
 
   <!-- HOME PAGE -->
   <div id="page-home" class="page active">
+    <div class="home-league-card" id="home-card-letna">
+      <div class="home-league-title">Letná <span>liga</span></div>
+      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
+    </div>
     <div class="home-league-card" id="home-card-prva">
       <div class="home-league-title">1. <span>Liga</span></div>
       <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
@@ -804,6 +808,7 @@
   <script src="stats.js"></script>
   <script>
     const LEAGUE_META = {
+      letna:  { label: 'Letná liga'  },
       prva:   { label: '1. Liga'     },
       open:   { label: 'Open liga'   },
       zenska: { label: 'Ženská liga' }
