@@ -888,9 +888,9 @@
       return m ? parseInt(m[1]) : 0;
     }
 
-    async function fetchWithTimeout(url) {
+    async function fetchWithTimeout(url, ms = 4000) {
       const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 4000);
+      const tid = setTimeout(() => ctrl.abort(), ms);
       try {
         const res = await fetch(url, { signal: ctrl.signal });
         clearTimeout(tid);
@@ -913,8 +913,8 @@
       if (!card) return;
       try {
         const url = T_LIST_BASE + lg.id;
-        const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-        const data = await res.json();
+        const data = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 8000);
+        if (!data) throw new Error('Timeout alebo chyba pri načítaní ligy ' + lg.key);
 
         const now = Date.now();
         const rounds = Object.entries(data).map(([tdid, t]) => ({
@@ -930,8 +930,14 @@
         let last = null;
         let next = null;
 
+        const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
+
         if (touched.length === 0) {
-          next = rounds.sort((a, b) => a.num - b.num)[0] || null;
+          next = untouched[0] || null;
+        } else if (touched.length === 1 && untouched.some(r => r.num > touched[0].num)) {
+          // len 1 touched kolo a su untouched s vyssim cislom = liga este nezacala
+          next = touched[0];
+          last = null;
         } else {
           const candidates = touched.slice(0, 2);
           const details = await Promise.allSettled(
@@ -959,7 +965,6 @@
             last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
           } else {
             last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
-            const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
             next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
           }
         }
