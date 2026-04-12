@@ -920,24 +920,24 @@
             // fetchni top 2 touched podla cisla kola pre status
             const candidates = touched.slice(0, 2);
 
-            async function fetchStatus(tdid) {
+            async function fetchWithTimeout(url) {
               const ctrl = new AbortController();
               const tid = setTimeout(() => ctrl.abort(), 4000);
               try {
-                const res = await fetch(T_DETAIL_BASE + tdid, { signal: ctrl.signal });
+                const res = await fetch(url, { signal: ctrl.signal });
                 clearTimeout(tid);
                 if (!res.ok) throw new Error();
-                const d = await res.json();
-                return d.status;
+                return await res.json();
               } catch {
                 clearTimeout(tid);
-                try {
-                  const res2 = await fetch(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
-                  if (!res2.ok) throw new Error();
-                  const d2 = await res2.json();
-                  return d2.status;
-                } catch { return null; }
+                return null;
               }
+            }
+
+            async function fetchStatus(tdid) {
+              const d = await fetchWithTimeout(T_DETAIL_BASE + tdid)
+                     ?? await fetchWithTimeout(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
+              return d?.status ?? null;
             }
 
             const details = await Promise.allSettled(
