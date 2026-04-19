@@ -1,6 +1,4 @@
 // ─── KONFIGURÁCIA ───────────────────────────────────────────────
-const SHEET_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-CWheH4oKX4LUXJyC0JYhBdIjtTaddL2O1x4vUg83HSmLnUfJJAT_Pr1DQGep7z_f-WGF3GWfDoBO/pub?output=csv";
 const CORS_PROXY = "https://h2h.dartssala.workers.dev/?url=";
 
 const NAME_ALIASES = {
@@ -22,7 +20,9 @@ const DISPLAY_OVERRIDES = {
   "tamas somogyi": "Tamás Somogyi",
   "roman herencar": "Roman Herenčár",
   "maros kosec": "Maroš Košec",
-  "nathan udvaros": "Nathan Udvaros"
+  "nathan udvaros": "Nathan Udvaros",
+  "gabriel kubovic": "Gábriel Kubovic",
+  "peter kacska": "Péter Kacska"
 };
 
 const MIN_OPP_MATCHES = 5;
@@ -38,6 +38,13 @@ const PERIODS = [
 
 // ─── NAČÍTANIE DÁT ──────────────────────────────────────────────
 
+// Lokálne JSON súbory pre H2H (1. liga)
+const LOCAL_PRVA_LIGA_FILES = [
+  "jsons/season14_prva liga_slim.json",
+  "jsons/season15_prva liga_slim.json",
+  "jsons/season16_prva liga_slim.json"
+];
+
 // Lokálne JSON súbory pre štatistiky hráčov (Open liga)
 const LOCAL_SEASON_FILES = [
   "jsons/season8_raw.json",
@@ -51,61 +58,34 @@ const LOCAL_SEASON_FILES = [
   "jsons/season16_open liga_slim.json"
 ];
 
-async function loadTournamentUrls() {
-  const res = await fetch(CORS_PROXY + encodeURIComponent(SHEET_CSV_URL));
-  if (!res.ok) throw new Error("Sheet sa nepodarilo načítať");
-  const text = await res.text();
-  const lines = text.trim().split("\n");
-  return lines.slice(1).map(l => l.replace(/^"|"$/g, "").trim()).filter(Boolean);
-}
-
-// Cache pre H2H (1. liga z Google Sheets)
-let _tournamentsCache = null;
-
-async function loadTournaments() {
-  if (_tournamentsCache) return _tournamentsCache;
-
-  const urls = await loadTournamentUrls();
+async function loadFilesFromList(files) {
   const results = await Promise.allSettled(
-    urls.map(async (url) => {
-      const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-      if (!res.ok) throw new Error("API chyba: " + res.status);
-      const data = await res.json();
-      return Array.isArray(data) ? data : [data];
-    })
-  );
-
-  const ok = results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
-
-  if (!ok.length) throw new Error("Žiadne dáta sa nepodarilo načítať.");
-  _tournamentsCache = ok;
-  return ok;
-}
-
-// Cache pre štatistiky hráčov (lokálne JSON súbory)
-let _localTournamentsCache = null;
-
-async function loadLocalTournaments() {
-  if (_localTournamentsCache) return _localTournamentsCache;
-
-  const results = await Promise.allSettled(
-    LOCAL_SEASON_FILES.map(async (path) => {
+    files.map(async (path) => {
       const res = await fetch(path);
       if (!res.ok) throw new Error("Súbor sa nepodarilo načítať: " + path);
       const data = await res.json();
       return Array.isArray(data) ? data : [data];
     })
   );
-
-  const ok = results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
-
-  if (!ok.length) throw new Error("Žiadne lokálne dáta sa nepodarilo načítať.");
-  _localTournamentsCache = ok;
+  const ok = results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
+  if (!ok.length) throw new Error("Žiadne dáta sa nepodarilo načítať.");
   return ok;
+}
+
+// Cache pre H2H (1. liga – lokálne JSON súbory)
+let _tournamentsCache = null;
+async function loadTournaments() {
+  if (_tournamentsCache) return _tournamentsCache;
+  _tournamentsCache = await loadFilesFromList(LOCAL_PRVA_LIGA_FILES);
+  return _tournamentsCache;
+}
+
+// Cache pre štatistiky hráčov (Open liga – lokálne JSON súbory)
+let _localTournamentsCache = null;
+async function loadLocalTournaments() {
+  if (_localTournamentsCache) return _localTournamentsCache;
+  _localTournamentsCache = await loadFilesFromList(LOCAL_SEASON_FILES);
+  return _localTournamentsCache;
 }
 
 // ─── POMOCNÉ FUNKCIE ────────────────────────────────────────────
