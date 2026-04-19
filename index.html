@@ -992,9 +992,12 @@
           </div>`;
         }
         html += '</div>';
-        card.querySelector('.home-rounds').outerHTML = html;
+        const roundsEl = card.querySelector('.home-rounds');
+        if (roundsEl) roundsEl.outerHTML = html;
       } catch (e) {
-        card.querySelector('.home-rounds').innerHTML =
+        console.error('loadOneLeague error:', e);
+        const roundsEl = card.querySelector('.home-rounds');
+        if (roundsEl) roundsEl.innerHTML =
           '<div class="home-round-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
       }
     }

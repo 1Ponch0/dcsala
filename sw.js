@@ -1,10 +1,10 @@
-const CACHE = "dcsala-v2";
+const CACHE = "dcsala-v3";
 const ASSETS = [
   "/dcsala/",
   "/dcsala/index.html",
-  "/dcsala/js/data.js",
-  "/dcsala/js/h2h.js",
-  "/dcsala/js/stats.js",
+  "/dcsala/data.js",
+  "/dcsala/h2h.js",
+  "/dcsala/stats.js",
   "/dcsala/manifest.json"
 ];
 
@@ -25,14 +25,15 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  // Network first pre API volania, cache first pre assety
+  // API volania nechaj prehliadač riešiť priamo – AbortController funguje správne
   if (e.request.url.includes("dartssala.workers.dev") ||
+      e.request.url.includes("n01darts.com") ||
+      e.request.url.includes("sakura.ne.jp") ||
       e.request.url.includes("googleapis.com") ||
       e.request.url.includes("clvaw-cdnwnd.com")) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-  } else {
-    e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request))
-    );
+    return;
   }
+  e.respondWith(
+    caches.match(e.request).then(cached => cached || fetch(e.request))
+  );
 });
