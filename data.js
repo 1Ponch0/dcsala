@@ -58,6 +58,26 @@ const LOCAL_SEASON_FILES = [
   "jsons/season16_open liga_slim.json"
 ];
 
+// Definície jednotlivých sezón pre výber
+const SEASON_DEFS = {
+  open: [
+    { label: "Sezóna 8",  files: ["jsons/season8_raw.json"] },
+    { label: "Sezóna 9",  files: ["jsons/season9_slim_no6.json"] },
+    { label: "Sezóna 10", files: ["jsons/season10_slim.json"] },
+    { label: "Sezóna 11", files: ["jsons/season11_slim.json"] },
+    { label: "Sezóna 12", files: ["jsons/season12_slim.json"] },
+    { label: "Sezóna 13", files: ["jsons/season13_slim.json"] },
+    { label: "Sezóna 14", files: ["jsons/season14_slim.json"] },
+    { label: "Sezóna 15", files: ["jsons/season15_slim.json"] },
+    { label: "Sezóna 16", files: ["jsons/season16_open liga_slim.json"] }
+  ],
+  prva: [
+    { label: "Sezóna 14", files: ["jsons/season14_prva liga_slim.json"] },
+    { label: "Sezóna 15", files: ["jsons/season15_prva liga_slim.json"] },
+    { label: "Sezóna 16", files: ["jsons/season16_prva liga_slim.json"] }
+  ]
+};
+
 async function loadFilesFromList(files) {
   const results = await Promise.allSettled(
     files.map(async (path) => {
@@ -237,4 +257,18 @@ async function getCombinedStatsData() {
   );
   _combinedStatsData = { nameStats, matches, keys };
   return _combinedStatsData;
+}
+
+const _seasonCache = {};
+async function getSeasonData(files) {
+  const key = files.join("|");
+  if (_seasonCache[key]) return _seasonCache[key];
+  const tournaments = await loadFilesFromList(files);
+  const { idToName, nameStats } = buildIdToName(tournaments);
+  const matches = extractMatches(tournaments, idToName);
+  const keys = Array.from(nameStats.keys()).sort((a, b) =>
+    nameStats.get(a).displayName.localeCompare(nameStats.get(b).displayName, "sk")
+  );
+  _seasonCache[key] = { nameStats, matches, keys };
+  return _seasonCache[key];
 }

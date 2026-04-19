@@ -167,49 +167,87 @@ function renderStatsGrid(stats) {
 }
 
 const LEAGUE_SOURCES = {
-  open:  { label: "Open liga",   getData: () => getStatsData()         },
-  prva:  { label: "Prvá liga",   getData: () => getSharedData()        },
-  vsetko:{ label: "Všetko",     getData: () => getCombinedStatsData() }
+  open:  { label: "Open liga", getData: () => getStatsData()         },
+  prva:  { label: "Prvá liga", getData: () => getSharedData()        },
+  vsetko:{ label: "Všetko",   getData: () => getCombinedStatsData() }
 };
 
 let currentSource = "open";
-let cachedData = {};
+let currentSeasonFiles = null; // null = všetky sezóny
 
-async function loadSource(source) {
-  if (!cachedData[source]) {
-    cachedData[source] = await LEAGUE_SOURCES[source].getData();
-  }
-  return cachedData[source];
+async function loadCurrent() {
+  if (currentSeasonFiles) return getSeasonData(currentSeasonFiles);
+  return LEAGUE_SOURCES[currentSource].getData();
+}
+
+function currentMinMatches() {
+  return currentSeasonFiles ? 1 : MIN_PLAYER_MATCHES;
 }
 
 async function initStats() {
   try {
-    // Prepínač líg
+    const sel        = document.getElementById("player");
     const toggleWrap = document.getElementById("stats-toggle");
-    if (toggleWrap) {
-      Object.entries(LEAGUE_SOURCES).forEach(([key, src]) => {
+    const seasonWrap = document.getElementById("stats-season-toggle");
+
+    // ── Liga prepínač ──
+    Object.entries(LEAGUE_SOURCES).forEach(([key, src]) => {
+      const btn = document.createElement("button");
+      btn.className = "toggle-btn" + (key === currentSource ? " active" : "");
+      btn.textContent = src.label;
+      btn.onclick = async () => {
+        currentSource = key;
+        currentSeasonFiles = null;
+        toggleWrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderSeasonToggle();
+        await switchSource();
+      };
+      toggleWrap.appendChild(btn);
+    });
+
+    // ── Sezóna prepínač ──
+    function renderSeasonToggle() {
+      seasonWrap.innerHTML = "";
+      const defs = SEASON_DEFS[currentSource];
+      if (!defs) return;
+
+      const allBtn = document.createElement("button");
+      allBtn.className = "toggle-btn active";
+      allBtn.textContent = "Všetky sezóny";
+      allBtn.onclick = async () => {
+        currentSeasonFiles = null;
+        seasonWrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+        allBtn.classList.add("active");
+        await switchSource();
+      };
+      seasonWrap.appendChild(allBtn);
+
+      defs.forEach(({ label, files }) => {
         const btn = document.createElement("button");
-        btn.className = "toggle-btn" + (key === currentSource ? " active" : "");
-        btn.textContent = src.label;
+        btn.className = "toggle-btn";
+        btn.textContent = label;
         btn.onclick = async () => {
-          currentSource = key;
-          toggleWrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+          currentSeasonFiles = files;
+          seasonWrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
           await switchSource();
         };
-        toggleWrap.appendChild(btn);
+        seasonWrap.appendChild(btn);
       });
     }
 
-    const sel = document.getElementById("player");
+    renderSeasonToggle();
 
+    // ── Načítanie hráčov ──
     async function switchSource() {
       const prevKey = sel.value;
       sel.innerHTML = "";
-      const { matches, nameStats, keys } = await loadSource(currentSource);
+      const { matches, nameStats, keys } = await loadCurrent();
+      const minM = currentMinMatches();
       keys.forEach(key => {
         const stats = computePlayerStats(matches, key, nameStats);
-        if (stats.matches >= MIN_PLAYER_MATCHES) {
+        if (stats.matches >= minM) {
           sel.add(new Option(nameStats.get(key).displayName, key));
         }
       });
@@ -226,7 +264,7 @@ async function initStats() {
       if (!k) return;
       currentKey = k;
 
-      loadSource(currentSource).then(({ matches, nameStats }) => {
+      loadCurrent().then(({ matches, nameStats }) => {
         const stats = computePlayerStats(matches, k, nameStats);
 
         document.getElementById("stats-pills").innerHTML = `
