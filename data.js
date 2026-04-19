@@ -47,7 +47,8 @@ const LOCAL_SEASON_FILES = [
   "jsons/season12_slim.json",
   "jsons/season13_slim.json",
   "jsons/season14_slim.json",
-  "jsons/season15_slim.json"
+  "jsons/season15_slim.json",
+  "jsons/season16_open liga_slim.json"
 ];
 
 async function loadTournamentUrls() {
