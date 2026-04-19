@@ -204,6 +204,7 @@ async function initStats() {
     const sel = document.getElementById("player");
 
     async function switchSource() {
+      const prevKey = sel.value;
       sel.innerHTML = "";
       const { matches, nameStats, keys } = await loadSource(currentSource);
       keys.forEach(key => {
@@ -212,10 +213,12 @@ async function initStats() {
           sel.add(new Option(nameStats.get(key).displayName, key));
         }
       });
-      if (sel.options.length >= 1) {
+      if (prevKey && [...sel.options].some(o => o.value === prevKey)) {
+        sel.value = prevKey;
+      } else if (sel.options.length >= 1) {
         sel.value = sel.options[0].value;
-        update();
       }
+      if (sel.value) update();
     }
 
     function update() {

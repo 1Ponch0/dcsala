@@ -950,7 +950,7 @@
           next = touched[0];
           last = null;
         } else {
-          const candidates = touched.slice(0, 2);
+          const candidates = touched.slice(0, 5);
           const details = await Promise.allSettled(
             candidates.map(async r => {
               const status = await fetchStatus(r.tdid);
@@ -967,13 +967,21 @@
           const upcomingCandidates = withStatus.filter(r => r.status !== 40);
 
           if (upcomingCandidates.length > 0) {
-            next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
-            const allPlayed = touched.filter(r => {
-              const found = withStatus.find(w => w.tdid === r.tdid);
-              if (found) return found.status === 40;
-              return true;
-            });
-            last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
+            if (playedCandidates.length > 0) {
+              // aktívna liga – niektoré kolá odohraté, niektoré nie
+              next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
+              const allPlayed = touched.filter(r => {
+                const found = withStatus.find(w => w.tdid === r.tdid);
+                if (found) return found.status === 40;
+                return true;
+              });
+              last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
+            } else {
+              // žiadne potvrdené zahrané kolá → liga ešte nezačala
+              last = null;
+              next = untouched.sort((a, b) => a.num - b.num)[0] ||
+                     upcomingCandidates.sort((a, b) => a.num - b.num)[0];
+            }
           } else {
             last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
             next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
