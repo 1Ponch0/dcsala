@@ -541,6 +541,16 @@
     }
     .home-view-btn:hover { border-color: var(--accentR); color: var(--accentR); }
 
+    /* ── STATS TOGGLE ── */
+    .toggle-wrap { display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
+    .toggle-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--stroke);
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .toggle-btn:hover { border-color: var(--accentR); color: var(--ink); }
+    .toggle-btn.active { background: var(--accentR); border-color: var(--accentR); color: #fff; }
+
     @media (max-width: 480px) {
       .opps-wrap { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -678,7 +688,7 @@
       <div class="drawer-group-items" id="grpitems-stats">
       <button class="drawer-item" id="nav-h2h" onclick="navTo('h2h',null,this)">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        H2H
+        H2H – Prvá liga
       </button>
       <button class="drawer-item" id="nav-player" onclick="navTo('player',null,this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -793,7 +803,8 @@
       <div>Načítavam dáta...</div>
     </div>
     <div id="stats-content" style="display:none">
-      <div class="card-title">Vyber hráča</div>
+      <div id="stats-toggle" class="toggle-wrap"></div>
+      <div class="card-title" style="margin-top:10px">Vyber hráča</div>
       <select id="player"></select>
       <div class="card">
         <div id="stats-pills" class="pill-row"></div>

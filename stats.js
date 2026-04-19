@@ -166,61 +166,101 @@ function renderStatsGrid(stats) {
   `;
 }
 
+const LEAGUE_SOURCES = {
+  open:  { label: "Open liga",   getData: () => getStatsData()         },
+  prva:  { label: "Prvá liga",   getData: () => getSharedData()        },
+  vsetko:{ label: "Všetko",     getData: () => getCombinedStatsData() }
+};
+
+let currentSource = "open";
+let cachedData = {};
+
+async function loadSource(source) {
+  if (!cachedData[source]) {
+    cachedData[source] = await LEAGUE_SOURCES[source].getData();
+  }
+  return cachedData[source];
+}
+
 async function initStats() {
   try {
-    const { matches, nameStats, keys } = await getStatsData();
+    // Prepínač líg
+    const toggleWrap = document.getElementById("stats-toggle");
+    if (toggleWrap) {
+      Object.entries(LEAGUE_SOURCES).forEach(([key, src]) => {
+        const btn = document.createElement("button");
+        btn.className = "toggle-btn" + (key === currentSource ? " active" : "");
+        btn.textContent = src.label;
+        btn.onclick = async () => {
+          currentSource = key;
+          toggleWrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          await switchSource();
+        };
+        toggleWrap.appendChild(btn);
+      });
+    }
 
     const sel = document.getElementById("player");
-    keys.forEach(key => {
-      const stats = computePlayerStats(matches, key, nameStats);
-      if (stats.matches >= MIN_PLAYER_MATCHES) {
-        sel.add(new Option(nameStats.get(key).displayName, key));
-      }
-    });
 
-    document.getElementById("stats-loading").style.display = "none";
-    document.getElementById("stats-content").style.display = "block";
+    async function switchSource() {
+      sel.innerHTML = "";
+      const { matches, nameStats, keys } = await loadSource(currentSource);
+      keys.forEach(key => {
+        const stats = computePlayerStats(matches, key, nameStats);
+        if (stats.matches >= MIN_PLAYER_MATCHES) {
+          sel.add(new Option(nameStats.get(key).displayName, key));
+        }
+      });
+      if (sel.options.length >= 1) {
+        sel.value = sel.options[0].value;
+        update();
+      }
+    }
 
     function update() {
       const k = sel.value;
       if (!k) return;
       currentKey = k;
 
-      const stats = computePlayerStats(matches, k, nameStats);
+      loadSource(currentSource).then(({ matches, nameStats }) => {
+        const stats = computePlayerStats(matches, k, nameStats);
 
-      document.getElementById("stats-pills").innerHTML = `
-        <div class="pill">Zápasy: ${stats.matches}</div>
-        <div class="pill">Výhry: ${stats.wins}</div>
-        <div class="pill">Prehry: ${stats.losses}</div>
-        <div class="pill">Remízy: ${stats.draws}</div>
-      `;
+        document.getElementById("stats-pills").innerHTML = `
+          <div class="pill">Zápasy: ${stats.matches}</div>
+          <div class="pill">Výhry: ${stats.wins}</div>
+          <div class="pill">Prehry: ${stats.losses}</div>
+          <div class="pill">Remízy: ${stats.draws}</div>
+        `;
 
-      document.getElementById("stats-grid").innerHTML = renderStatsGrid(stats);
+        document.getElementById("stats-grid").innerHTML = renderStatsGrid(stats);
 
-      const periodSelect = document.getElementById("periodSelect");
-      const avgFill = document.getElementById("avgFill");
-      const avgValue = document.getElementById("avgValue");
+        const periodSelect = document.getElementById("periodSelect");
+        const avgFill = document.getElementById("avgFill");
+        const avgValue = document.getElementById("avgValue");
 
-      function updateAvg() {
-        const avg = avgForPeriod(stats.playerMatches, Number(periodSelect.value));
-        if (avg == null) {
-          avgFill.style.width = "0%";
-          avgValue.textContent = "Žiadne zápasy v období";
-          return;
+        function updateAvg() {
+          const avg = avgForPeriod(stats.playerMatches, Number(periodSelect.value));
+          if (avg == null) {
+            avgFill.style.width = "0%";
+            avgValue.textContent = "Žiadne zápasy v období";
+            return;
+          }
+          avgFill.style.width = Math.min(100, avg) + "%";
+          avgValue.textContent = `Priemer: ${avg.toFixed(2)}`;
         }
-        avgFill.style.width = Math.min(100, avg) + "%";
-        avgValue.textContent = `Priemer: ${avg.toFixed(2)}`;
-      }
 
-      periodSelect.addEventListener("change", updateAvg);
-      updateAvg();
+        periodSelect.addEventListener("change", updateAvg);
+        updateAvg();
+      });
     }
 
     sel.addEventListener("change", update);
-    if (sel.options.length >= 1) {
-      sel.value = sel.options[0].value;
-      update();
-    }
+
+    document.getElementById("stats-loading").style.display = "none";
+    document.getElementById("stats-content").style.display = "block";
+
+    await switchSource();
   } catch (err) {
     document.getElementById("stats-loading").style.display = "none";
     document.getElementById("stats-error").textContent =

@@ -220,3 +220,21 @@ async function getStatsData() {
   _statsData = { tournaments, idToName, nameStats, matches, keys };
   return _statsData;
 }
+
+let _combinedStatsData = null;
+
+async function getCombinedStatsData() {
+  if (_combinedStatsData) return _combinedStatsData;
+  const [open, prva] = await Promise.all([getStatsData(), getSharedData()]);
+  const nameStats = new Map([...open.nameStats, ...prva.nameStats]);
+  // Merge nameStats — pre hráčov v oboch ligách zachovaj lepší displayName
+  for (const [key, val] of prva.nameStats) {
+    if (!open.nameStats.has(key)) nameStats.set(key, val);
+  }
+  const matches = [...open.matches, ...prva.matches];
+  const keys = Array.from(nameStats.keys()).sort((a, b) =>
+    nameStats.get(a).displayName.localeCompare(nameStats.get(b).displayName, "sk")
+  );
+  _combinedStatsData = { nameStats, matches, keys };
+  return _combinedStatsData;
+}
