@@ -980,8 +980,7 @@
             } else {
               // žiadne potvrdené zahrané kolá → liga ešte nezačala
               last = null;
-              next = untouched.sort((a, b) => a.num - b.num)[0] ||
-                     upcomingCandidates.sort((a, b) => a.num - b.num)[0];
+              next = rounds.slice().sort((a, b) => a.num - b.num)[0];
             }
           } else {
             last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
