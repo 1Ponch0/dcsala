@@ -15,43 +15,46 @@
   <meta name="apple-mobile-web-app-title" content="DC Šaľa">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Bebas+Neue&display=swap');
 
     :root {
-      --bg: #0b0f14;
-      --bg2: #0f1722;
-      --ink: #f2f2f2;
-      --muted: #aab1ba;
-      --accentL: #e7e7e7;
-      --accentR: #d1003a;
-      --card: #0f1722;
-      --stroke: #1f2a38;
-      --track: #0a1b27;
-      --pill: #111a26;
-      --win: #1abc55;
-      --draw: #f5a623;
-      --loss: #e74c3c;
-      --unk: #55606b;
-      --wr-good: #2ecc71;
-      --wr-mid: #f5a623;
-      --wr-bad: #e74c3c;
-      --drawer-w: 270px;
+      --bg:      #0d0e1f;
+      --bg2:     #11132a;
+      --ink:     #eef0ff;
+      --muted:   #7b82a8;
+      --accentL: #e7e7f0;
+      --accentR: #7c5af6;
+      --accent2: #a78bfa;
+      --card:    #12142c;
+      --stroke:  #1e2045;
+      --track:   #0a0b1e;
+      --pill:    #0f1130;
+      --win:     #22c55e;
+      --draw:    #f59e0b;
+      --loss:    #ef4444;
+      --unk:     #4b5280;
+      --wr-good: #22c55e;
+      --wr-mid:  #f59e0b;
+      --wr-bad:  #ef4444;
+      --drawer-w: 260px;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: "DM Sans", sans-serif;
-      background: var(--bg);
+      font-family: "Outfit", sans-serif;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,90,246,0.12) 0%, transparent 70%), var(--bg);
       color: var(--ink);
       min-height: 100vh;
     }
 
     /* ── HEADER ── */
     .app-header {
-      background: linear-gradient(180deg, #0d1520 0%, #0b0f14 100%);
-      border-bottom: 1px solid var(--stroke);
+      background: rgba(13, 14, 31, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124,90,246,0.15);
       padding: 12px 16px;
       display: flex;
       align-items: center;
@@ -114,47 +117,61 @@
       position: fixed;
       top: 0; left: 0; bottom: 0;
       width: var(--drawer-w);
-      background: #0d1520;
-      border-right: 1px solid var(--stroke);
+      background: #13152e;
+      border-right: none;
       z-index: 400;
       transform: translateX(-100%);
       transition: transform 0.28s cubic-bezier(.4,0,.2,1);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      padding: 0;
     }
     .drawer.open { transform: translateX(0); }
 
     .drawer-header {
-      padding: 20px 20px 14px;
-      border-bottom: 1px solid var(--stroke);
+      border-bottom: 1px solid rgba(124,90,246,0.12);
+      padding: 24px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+    .drawer-header img {
+      height: 64px !important;
+      width: 64px !important;
+      object-fit: contain;
+      border-radius: 50% !important;
+      background: rgba(124,90,246,0.15) !important;
+      padding: 8px !important;
+      border: 2px solid rgba(124,90,246,0.3) !important;
     }
     .drawer-logo {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
+      font-family: "Outfit", sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
     .drawer-logo span { color: var(--accentR); }
     .drawer-sub {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--muted);
-      letter-spacing: 2.5px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
+      margin-top: -4px;
     }
 
     /* Drawer sections */
-    .drawer-section {
-      padding: 4px 0;
-      border-bottom: 1px solid var(--stroke);
-    }
+    .drawer-section { border-bottom: none; padding: 8px 0; }
     .drawer-section:last-child { border-bottom: none; }
 
     .drawer-section-title {
-      padding: 6px 20px;
-      font-size: 10px;
+      padding: 6px 20px 2px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--muted);
+      letter-spacing: 2.5px;
+      color: rgba(123,130,168,0.5);
       text-transform: uppercase;
     }
 
@@ -163,92 +180,93 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 16px 9px 36px;
+      padding: 10px 20px 10px 44px;
       cursor: pointer;
-      color: var(--muted);
+      color: rgba(123,130,168,0.8);
       font-size: 13px;
-      font-weight: 400;
+      font-weight: 500;
       border: none;
+      border-left: 4px solid transparent;
       background: none;
       width: 100%;
       text-align: left;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
       border-radius: 0;
+      position: relative;
     }
-    .drawer-item:hover { background: rgba(255,255,255,0.04); color: var(--ink); }
+    .drawer-item:hover { background: rgba(124,90,246,0.07); color: var(--ink); border-left-color: rgba(124,90,246,0.3); }
     .drawer-item.active {
-      color: var(--accentR);
-      background: rgba(209,0,58,0.10);
-      border-left: 3px solid var(--accentR);
-      padding-left: 33px;
+      color: #fff;
+      background: rgba(124,90,246,0.12);
+      border-left: 4px solid var(--accentR);
+      padding-left: 44px;
+      font-weight: 600;
     }
-    .drawer-item svg {
-      width: 14px; height: 14px;
-      stroke: currentColor; fill: none; stroke-width: 1.8;
-      flex-shrink: 0; opacity: 0.7;
-    }
+    .drawer-item svg { display: none; }
 
     /* ── DRAWER PARENT (hlavné sekcie – nerozbaľovacie) ── */
     .drawer-parent {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 16px;
-      font-size: 11px;
+      padding: 6px 20px 2px;
+      font-size: 9px;
       font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 2px;
+      color: rgba(123,130,168,0.5);
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      background: rgba(255,255,255,0.03);
-      border-top: 1px solid var(--stroke);
-      margin-top: 2px;
+      background: none;
+      border-top: none;
+      margin-top: 0;
       cursor: default;
     }
-    .drawer-parent svg {
-      width: 13px; height: 13px;
-      stroke: currentColor; fill: none; stroke-width: 1.8;
-      flex-shrink: 0;
-    }
+    .drawer-parent svg { display: none; }
 
     /* ── COLLAPSIBLE GROUP TOGGLE (hlavné rozbaľovacie) ── */
     .drawer-group-toggle {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 11px 16px;
+      padding: 13px 20px;
       cursor: pointer;
-      color: var(--ink);
-      font-size: 14px;
+      color: var(--muted);
+      font-size: 15px;
       font-weight: 600;
       border: none;
+      border-left: 4px solid transparent;
       background: none;
       width: 100%;
       text-align: left;
-      transition: background 0.15s;
-      letter-spacing: 0.2px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      letter-spacing: 0;
+      border-radius: 0;
+      margin-bottom: 0;
     }
-    .drawer-group-toggle:hover { background: rgba(255,255,255,0.04); }
+    .drawer-group-toggle:hover { background: rgba(124,90,246,0.07); color: var(--ink); border-left-color: rgba(124,90,246,0.3); }
     .drawer-group-toggle.active {
-      color: var(--accentR);
-      background: rgba(209,0,58,0.10);
-      border-left: 3px solid var(--accentR);
-      padding-left: 13px;
+      color: #fff;
+      background: rgba(124,90,246,0.12);
+      border-left: 4px solid var(--accentR);
+      padding-left: 20px;
+      border-radius: 0;
     }
     .drawer-group-toggle .gtitle { display: flex; align-items: center; gap: 10px; }
-    .drawer-group-toggle .gtitle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+    .drawer-group-toggle .gtitle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; opacity: 0.7; }
+    .drawer-group-toggle.active .gtitle svg { opacity: 1; color: var(--accentR); }
     .drawer-group-toggle .chevron {
       width: 17px; height: 17px;
       transition: transform 0.2s;
       flex-shrink: 0;
-      color: #fff;
-      stroke: #fff !important;
+      color: var(--muted);
+      stroke: var(--muted) !important;
     }
     .drawer-group-toggle.open .chevron { transform: rotate(180deg); }
 
     .drawer-group-items {
       max-height: 0;
       overflow: hidden;
-      background: rgba(0,0,0,0.15);
+      background: rgba(0,0,0,0.12);
+      padding-left: 0;
       transition: max-height 0.25s ease;
     }
     .drawer-group-items.open { max-height: 400px; }
@@ -278,11 +296,11 @@
     .tab-btn {
       flex: 1;
       padding: 8px 0;
-      border-radius: 10px;
-      border: 1px solid var(--stroke);
-      background: var(--pill);
+      border-radius: 12px;
+      border: 1px solid rgba(124,90,246,0.2);
+      background: rgba(124,90,246,0.05);
       color: var(--muted);
-      font-family: "DM Sans", sans-serif;
+      font-family: "Outfit", sans-serif;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
@@ -362,7 +380,7 @@
     }
     .spinner {
       width: 36px; height: 36px;
-      border: 3px solid var(--stroke);
+      border: 3px solid rgba(124,90,246,0.2);
       border-top-color: var(--accentR);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -371,17 +389,18 @@
 
     /* ── CARDS ── */
     .card {
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      border-radius: 16px;
+      background: linear-gradient(135deg, #13152d 0%, #0f112a 100%);
+      border: 1px solid rgba(124,90,246,0.18);
+      border-radius: 20px;
       padding: 16px;
       margin-bottom: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,90,246,0.06);
     }
     .card-title {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 15px;
-      letter-spacing: 2px;
+      font-family: "Outfit", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
       color: var(--muted);
       text-transform: uppercase;
       margin-bottom: 12px;
@@ -389,12 +408,13 @@
 
     /* ── SELECT ── */
     select {
-      font-family: "DM Sans", sans-serif;
+      font-family: "Outfit", sans-serif;
       font-size: 16px;
       padding: 12px 14px;
       border: 1px solid var(--stroke);
-      border-radius: 12px;
+      border-radius: 14px;
       background: var(--card);
+      border-color: rgba(124,90,246,0.2);
       color: var(--ink);
       width: 100%;
       margin-bottom: 12px;
@@ -408,18 +428,19 @@
     /* ── PILLS ── */
     .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
     .pill {
-      background: var(--pill);
-      border: 1px solid var(--stroke);
+      background: rgba(124,90,246,0.10);
+      border: 1px solid rgba(124,90,246,0.22);
       padding: 6px 12px;
       border-radius: 999px;
       font-weight: 700;
       font-size: 13px;
+      font-family: "Outfit", sans-serif;
       white-space: nowrap;
     }
 
     /* ── H2H ── */
     .h2h-players { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .player-box { padding: 12px; border: 1px solid var(--stroke); border-radius: 12px; background: #0e1520; }
+    .player-box { padding: 12px; border: 1px solid rgba(124,90,246,0.18); border-radius: 16px; background: linear-gradient(135deg, #13152d 0%, #0f112a 100%); }
     .player-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
     .player-box .name { font-size: 17px; font-weight: 700; margin-top: 2px; }
 
@@ -431,8 +452,8 @@
     .stat-row-grid { display: grid; grid-template-columns: 64px 1fr 64px; gap: 10px; align-items: center; }
     .val { font-size: 20px; font-weight: 700; text-align: center; }
     .track {
-      position: relative; height: 14px; background: var(--track);
-      border-radius: 999px; overflow: hidden; border: 1px solid #0c2532;
+      position: relative; height: 14px; background: rgba(124,90,246,0.08);
+      border-radius: 999px; overflow: hidden; border: 1px solid rgba(124,90,246,0.12);
     }
     .bar-left, .bar-right { position: absolute; top: 0; bottom: 0; width: 50%; }
     .bar-left { right: 50%; background: var(--accentL); border-radius: 999px 0 0 999px; }
@@ -441,8 +462,8 @@
     /* ── PLAYER STATS ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .stat-box { background: #0e1520; border: 1px solid var(--stroke); border-radius: 12px; padding: 12px; text-align: center; }
-    .stat-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-box { background: linear-gradient(135deg, #13152d 0%, #0f112a 100%); border: 1px solid rgba(124,90,246,0.18); border-radius: 16px; padding: 12px; text-align: center; }
+    .stat-box .label { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; font-family: "Outfit", sans-serif; }
     .stat-box .value { font-size: 22px; font-weight: 700; color: var(--accentR); }
 
     .form-boxes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
@@ -453,7 +474,7 @@
     .box.unk { background: var(--unk); }
 
     .opps-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .opp-card { background: #0d1724; border: 1px solid #233045; border-radius: 12px; padding: 12px 10px; text-align: center; }
+    .opp-card { background: rgba(124,90,246,0.06); border: 1px solid rgba(124,90,246,0.15); border-radius: 16px; padding: 12px 10px; text-align: center; }
     .opp-name { display: block; font-size: 14px; font-weight: 700; }
     .opp-count { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
     .opp-wpr { display: flex; justify-content: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
@@ -466,8 +487,8 @@
     .wr-mid  { color: var(--wr-mid); }
     .wr-bad  { color: var(--wr-bad); }
 
-    .avg-bar { height: 14px; background: #0a1b27; border: 1px solid #0c2532; border-radius: 999px; overflow: hidden; }
-    .avg-fill { height: 100%; background: var(--accentR); transition: width 300ms ease; }
+    .avg-bar { height: 14px; background: rgba(124,90,246,0.1); border: 1px solid rgba(124,90,246,0.15); border-radius: 999px; overflow: hidden; }
+    .avg-fill { height: 100%; background: linear-gradient(90deg, #7c5af6, #a78bfa); transition: width 300ms ease; }
     .avg-value { margin-top: 6px; color: var(--muted); font-size: 13px; text-align: center; }
 
     .period-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
@@ -478,17 +499,18 @@
 
     /* ── HOME PAGE ── */
     .home-league-card {
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      border-radius: 16px;
+      background: linear-gradient(135deg, #13152d 0%, #0f112a 100%);
+      border: 1px solid rgba(124,90,246,0.18);
+      border-radius: 20px;
       padding: 16px;
       margin-bottom: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,90,246,0.06);
     }
     .home-league-title {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 18px;
-      letter-spacing: 2px;
+      font-family: "Outfit", sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
       color: var(--ink);
       margin-bottom: 12px;
       display: flex;
@@ -506,11 +528,11 @@
       padding: 10px 12px;
       border: 1px solid var(--stroke);
     }
-    .home-round.played { background: #0e1a14; border-color: #1a3a28; }
-    .home-round.upcoming { background: #0e141a; border-color: #1a2a3a; }
+    .home-round.played { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.25); }
+    .home-round.upcoming { background: rgba(124,90,246,0.07); border-color: rgba(124,90,246,0.25); }
     a.home-round.clickable { display: block; text-decoration: none; cursor: pointer; transition: border-color .2s, background .2s; }
-    a.home-round.upcoming.clickable:hover { background: #132035; border-color: #5b8dd9; }
-    a.home-round.played.clickable:hover { background: #0a2018; border-color: var(--win); }
+    a.home-round.upcoming.clickable:hover { background: rgba(124,90,246,0.14); border-color: var(--accentR); }
+    a.home-round.played.clickable:hover { background: rgba(34,197,94,0.12); border-color: var(--win); }
     .hr-label {
       font-size: 10px;
       font-weight: 700;
@@ -519,7 +541,7 @@
       margin-bottom: 4px;
     }
     .home-round.played .hr-label { color: var(--win); }
-    .home-round.upcoming .hr-label { color: #5b8dd9; }
+    .home-round.upcoming .hr-label { color: var(--accentR); }
     .hr-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
     .hr-date { font-size: 11px; color: var(--muted); }
     .home-round-loading { color: var(--muted); font-size: 12px; padding: 8px 0; }
@@ -528,24 +550,25 @@
       margin-top: 12px;
       padding: 8px 0;
       background: none;
-      border: 1px solid var(--stroke);
-      border-radius: 8px;
+      border: 1px solid rgba(124,90,246,0.25);
+      border-radius: 12px;
       color: var(--muted);
-      font-family: "DM Sans", sans-serif;
+      font-family: "Outfit", sans-serif;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       width: 100%;
       letter-spacing: 0.5px;
-      transition: border-color 0.2s, color 0.2s;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
     }
-    .home-view-btn:hover { border-color: var(--accentR); color: var(--accentR); }
+    .home-view-btn:hover { border-color: var(--accentR); color: var(--accentR); background: rgba(124,90,246,0.06); }
 
     /* ── STATS TOGGLE ── */
     .toggle-wrap { display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
     .toggle-btn {
-      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--stroke);
+      padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(124,90,246,0.25);
       background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+      font-family: "Outfit", sans-serif;
       cursor: pointer; transition: all .15s;
     }
     .toggle-btn:hover { border-color: var(--accentR); color: var(--ink); }
