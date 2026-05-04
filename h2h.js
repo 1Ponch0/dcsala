@@ -140,10 +140,6 @@ async function initH2H() {
       }
 
       // Meta pills inside cards
-      const metaL = document.getElementById('h2h-meta-left');
-      const metaR = document.getElementById('h2h-meta-right');
-      if (metaL) metaL.innerHTML = `<span class="h2h-meta-pill">${h2h.wins1} výhier</span><span class="h2h-meta-pill">${h2h.legs1} legov</span>`;
-      if (metaR) metaR.innerHTML = `<span class="h2h-meta-pill">${h2h.wins2} výhier</span><span class="h2h-meta-pill">${h2h.legs2} legov</span>`;
 
       // Summary pills
       document.getElementById("h2h-pills").innerHTML = `
