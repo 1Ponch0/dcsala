@@ -166,6 +166,49 @@ function renderStatsGrid(stats) {
   `;
 }
 
+/* ── Player hero card ── */
+function updatePlayerHero(name, stats) {
+  const heroEl = document.getElementById('player-hero');
+  if (!heroEl) return;
+
+  // Avatar initials
+  const avatarEl = document.getElementById('player-hero-avatar');
+  if (avatarEl) {
+    avatarEl.textContent = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  // Name
+  const nameEl = document.getElementById('player-hero-name');
+  if (nameEl) nameEl.textContent = name;
+
+  // Meta: matches count + avg
+  const metaEl = document.getElementById('player-hero-meta');
+  if (metaEl) {
+    const avgStr = stats.avgTotal != null ? ` · Priemer: ${stats.avgTotal.toFixed(2)}` : '';
+    metaEl.textContent = `${stats.matches} zápasov${avgStr}`;
+  }
+
+  // WR ring animation
+  const wrValue = document.getElementById('player-hero-wr');
+  const wrRing = document.getElementById('wr-ring-fill');
+  const wr = Math.round(stats.winRate);
+  if (wrValue) wrValue.textContent = wr + '%';
+  if (wrRing) {
+    // circumference = 2 * π * r = 2 * π * 32 ≈ 201
+    const circumference = 201;
+    const offset = circumference - (wr / 100) * circumference;
+    // Reset first for re-animation
+    wrRing.style.transition = 'none';
+    wrRing.style.strokeDashoffset = circumference;
+    // Force reflow then animate
+    wrRing.getBoundingClientRect();
+    wrRing.style.transition = 'stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)';
+    wrRing.style.strokeDashoffset = offset;
+  }
+
+  heroEl.style.display = 'flex';
+}
+
 const LEAGUE_SOURCES = {
   open:  { label: "Open liga", getData: () => getStatsData()         },
   prva:  { label: "Prvá liga", getData: () => getSharedData()        },
@@ -266,6 +309,10 @@ async function initStats() {
 
       loadCurrent().then(({ matches, nameStats }) => {
         const stats = computePlayerStats(matches, k, nameStats);
+        const playerName = nameStats.get(k).displayName;
+
+        // Update player hero card
+        updatePlayerHero(playerName, stats);
 
         document.getElementById("stats-pills").innerHTML = `
           <div class="pill">Zápasy: ${stats.matches}</div>

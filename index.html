@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Darts Club Šaľa</title>
   <meta name="description" content="Štatistiky hráčov Darts Club Šaľa">
-  <meta name="theme-color" content="#0b0f14">
+  <meta name="theme-color" content="#0b0f1a">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
@@ -14,71 +14,411 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DC Šaľa">
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Bebas+Neue&display=swap');
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Bebas+Neue&family=Syne:wght@700;800&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 
+  <style>
     :root {
-      --bg:      #0d0e1f;
-      --bg2:     #11132a;
-      --ink:     #eef0ff;
-      --muted:   #7b82a8;
-      --accentL: #e7e7f0;
-      --accentR: #7c5af6;
-      --accent2: #a78bfa;
-      --card:    #12142c;
-      --stroke:  #1e2045;
-      --track:   #0a0b1e;
-      --pill:    #0f1130;
-      --win:     #22c55e;
-      --draw:    #f59e0b;
-      --loss:    #ef4444;
-      --unk:     #4b5280;
-      --wr-good: #22c55e;
-      --wr-mid:  #f59e0b;
-      --wr-bad:  #ef4444;
-      --drawer-w: 260px;
+      --bg:        #090b18;
+      --bg2:       #0d0f20;
+      --sidebar:   #0f1125;
+      --sidebar2:  #141630;
+      --card:      #13152e;
+      --card2:     #171935;
+      --ink:       #eef0ff;
+      --ink2:      #b8bcdf;
+      --muted:     #6b7299;
+      --stroke:    #1e2248;
+      --stroke2:   rgba(124,90,246,0.15);
+      --accent:    #7c5af6;
+      --accent2:   #a78bfa;
+      --accent3:   #c4b5fd;
+      --win:       #22c55e;
+      --draw:      #f59e0b;
+      --loss:      #ef4444;
+      --unk:       #4b5280;
+      --sidebar-w: 260px;
+      --header-h:  64px;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
       font-family: "Outfit", sans-serif;
-      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,90,246,0.12) 0%, transparent 70%), var(--bg);
+      background: var(--bg);
       color: var(--ink);
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* ── HEADER ── */
-    .app-header {
-      background: rgba(13, 14, 31, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(124,90,246,0.15);
-      padding: 12px 16px;
+    /* ═══════════════════════════════════════════
+       ATMOSPHERIC BACKGROUND
+    ═══════════════════════════════════════════ */
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Base deep gradient */
+    .bg-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 60% at 15% 20%, rgba(60,40,140,0.45) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(30,20,90,0.5) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 70% 10%, rgba(80,50,180,0.2) 0%, transparent 55%),
+        linear-gradient(160deg, #0a0c1e 0%, #07091a 50%, #080a1c 100%);
+    }
+
+    /* Animated glow orbs */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+      animation: orbFloat linear infinite;
+    }
+    .glow-orb-1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(100,65,220,0.7) 0%, rgba(70,40,160,0.3) 50%, transparent 75%);
+      top: -120px; left: -80px;
+      animation-duration: 22s;
+      animation-name: orbFloat1;
+    }
+    .glow-orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(50,30,140,0.6) 0%, rgba(40,20,110,0.25) 50%, transparent 75%);
+      bottom: -80px; right: -60px;
+      animation-duration: 28s;
+      animation-name: orbFloat2;
+    }
+    .glow-orb-3 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(120,80,240,0.35) 0%, transparent 65%);
+      top: 40%; left: 30%;
+      animation-duration: 35s;
+      animation-name: orbFloat3;
+      opacity: 0.3;
+    }
+
+    @keyframes orbFloat1 {
+      0%   { transform: translate(0, 0) scale(1); }
+      33%  { transform: translate(40px, 30px) scale(1.08); }
+      66%  { transform: translate(-20px, 50px) scale(0.95); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes orbFloat2 {
+      0%   { transform: translate(0, 0) scale(1); }
+      40%  { transform: translate(-50px, -30px) scale(1.05); }
+      70%  { transform: translate(20px, -50px) scale(0.92); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes orbFloat3 {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(60px, -40px) scale(1.12); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* SVG noise texture overlay */
+    .bg-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* Subtle grid lines */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.025;
+      background-image:
+        linear-gradient(rgba(124,90,246,0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,90,246,0.8) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+
+    /* Everything above bg must be above z-index:0 */
+    .sidebar, .main-wrap { position: relative; z-index: 1; }
+
+    /* ═══════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════ */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: rgba(13, 14, 32, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(124,90,246,0.12);
+      display: flex;
+      flex-direction: column;
+      z-index: 400;
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      overflow: hidden;
+    }
+
+    /* Mobile: sidebar is a drawer */
+    @media (max-width: 767px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: 20px 0 60px rgba(0,0,0,0.6); }
+    }
+
+    /* ── Sidebar brand ── */
+    .sidebar-brand {
+      padding: 24px 20px 20px;
       display: flex;
       align-items: center;
       gap: 12px;
+      border-bottom: 1px solid var(--stroke);
+      flex-shrink: 0;
+    }
+    .sidebar-logo-img {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: rgba(124,90,246,0.15);
+      border: 1px solid rgba(124,90,246,0.3);
+      object-fit: contain;
+      padding: 5px;
+      flex-shrink: 0;
+    }
+    .sidebar-brand-text { flex: 1; min-width: 0; }
+    .sidebar-brand-name {
+      font-family: "Outfit", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-brand-name span { color: var(--accent); }
+    .sidebar-brand-sub {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    /* ── Sidebar nav ── */
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--stroke) transparent;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--stroke); border-radius: 4px; }
+
+    .nav-section { margin-bottom: 4px; }
+    .nav-section-label {
+      padding: 16px 20px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--accent2);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(124,90,246,0.3), transparent);
+      border-radius: 1px;
+    }
+
+    /* Top-level nav item (collapsible group) */
+    .nav-group-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 16px 10px 20px;
+      background: none;
+      border: none;
+      color: var(--ink2);
+      font-family: "Outfit", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      border-radius: 0;
+      text-align: left;
+      position: relative;
+    }
+    .nav-group-btn:hover { color: var(--ink); background: rgba(124,90,246,0.06); }
+    .nav-group-btn.active { color: var(--ink); }
+    .nav-group-btn .ginner { display: flex; align-items: center; gap: 10px; }
+    .nav-group-btn .gicon {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: rgba(124,90,246,0.1);
+      border: 1px solid rgba(124,90,246,0.18);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .nav-group-btn:hover .gicon,
+    .nav-group-btn.active .gicon {
+      background: rgba(124,90,246,0.18);
+      border-color: rgba(124,90,246,0.35);
+    }
+    .nav-group-btn .gicon svg {
+      width: 16px; height: 16px;
+      stroke: var(--accent2);
+      fill: none;
+      stroke-width: 1.8;
+    }
+    .nav-group-btn .glabel { flex: 1; }
+    .nav-group-btn .chevron {
+      width: 16px; height: 16px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .nav-group-btn.open .chevron { transform: rotate(180deg); }
+
+    /* Active indicator bar */
+    .nav-group-btn.active-page::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 24px;
+      background: var(--accent);
+      border-radius: 0 3px 3px 0;
+    }
+
+    /* Sub-items */
+    .nav-group-items {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+    .nav-group-items.open { max-height: 500px; }
+
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 16px 8px 64px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: "Outfit", sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      text-align: left;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
+    .nav-sub-item:hover { color: var(--ink); background: rgba(124,90,246,0.05); }
+    .nav-sub-item.active {
+      color: var(--accent3);
+      background: rgba(124,90,246,0.08);
+      border-left-color: var(--accent);
+    }
+    .nav-sub-item .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+    .nav-sub-item.active .dot { opacity: 1; background: var(--accent); }
+
+    /* Sidebar bottom */
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--stroke);
+      flex-shrink: 0;
+    }
+    .sidebar-footer-text {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .sidebar-footer-text span { color: var(--accent2); }
+
+    /* ═══════════════════════════════════════════
+       OVERLAY (mobile)
+    ═══════════════════════════════════════════ */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 300;
+    }
+    .overlay.open { display: block; }
+
+    /* ═══════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════ */
+    .main-wrap {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 767px) {
+      .main-wrap { margin-left: 0; }
+    }
+
+    /* ── Top Header ── */
+    .topbar {
+      height: var(--header-h);
+      background: rgba(9, 11, 24, 0.72);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(124,90,246,0.1);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
       position: sticky;
       top: 0;
       z-index: 200;
+      flex-shrink: 0;
     }
 
     .hamburger {
+      display: none;
       background: none;
       border: none;
       color: var(--ink);
       cursor: pointer;
-      padding: 4px;
-      display: flex;
+      padding: 6px;
+      border-radius: 8px;
       flex-direction: column;
       gap: 5px;
       flex-shrink: 0;
+      transition: background 0.15s;
     }
+    .hamburger:hover { background: rgba(124,90,246,0.1); }
     .hamburger span {
       display: block;
-      width: 22px;
-      height: 2px;
+      width: 20px; height: 2px;
       background: var(--ink);
       border-radius: 2px;
       transition: transform 0.25s, opacity 0.25s;
@@ -87,285 +427,286 @@
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    .app-logo {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 24px;
-      letter-spacing: 2px;
-      color: var(--ink);
-      line-height: 1;
-    }
-    .app-logo span { color: var(--accentR); }
-    .app-logo-sub {
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 3px;
-      text-transform: uppercase;
+    @media (max-width: 767px) {
+      .hamburger { display: flex; }
     }
 
-    /* ── DRAWER OVERLAY ── */
-    .drawer-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 300;
-    }
-    .drawer-overlay.open { display: block; }
-
-    /* ── DRAWER ── */
-    .drawer {
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      width: var(--drawer-w);
-      background: #13152e;
-      border-right: none;
-      z-index: 400;
-      transform: translateX(-100%);
-      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      padding: 0;
-    }
-    .drawer.open { transform: translateX(0); }
-
-    .drawer-header {
-      border-bottom: 1px solid rgba(124,90,246,0.12);
-      padding: 24px 20px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 10px;
-    }
-    .drawer-header img {
-      height: 64px !important;
-      width: 64px !important;
-      object-fit: contain;
-      border-radius: 50% !important;
-      background: rgba(124,90,246,0.15) !important;
-      padding: 8px !important;
-      border: 2px solid rgba(124,90,246,0.3) !important;
-    }
-    .drawer-logo {
-      font-family: "Outfit", sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .drawer-logo span { color: var(--accentR); }
-    .drawer-sub {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-top: -4px;
-    }
-
-    /* Drawer sections */
-    .drawer-section { border-bottom: none; padding: 8px 0; }
-    .drawer-section:last-child { border-bottom: none; }
-
-    .drawer-section-title {
-      padding: 6px 20px 2px;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      color: rgba(123,130,168,0.5);
-      text-transform: uppercase;
-    }
-
-    /* ── DRAWER ITEM (podpoložky) ── */
-    .drawer-item {
+    .topbar-breadcrumb {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px 10px 44px;
-      cursor: pointer;
-      color: rgba(123,130,168,0.8);
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+    .topbar-section {
       font-size: 13px;
-      font-weight: 500;
-      border: none;
-      border-left: 4px solid transparent;
-      background: none;
-      width: 100%;
-      text-align: left;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      border-radius: 0;
-      position: relative;
-    }
-    .drawer-item:hover { background: rgba(124,90,246,0.07); color: var(--ink); border-left-color: rgba(124,90,246,0.3); }
-    .drawer-item.active {
-      color: #fff;
-      background: rgba(124,90,246,0.12);
-      border-left: 4px solid var(--accentR);
-      padding-left: 44px;
-      font-weight: 600;
-    }
-    .drawer-item svg { display: none; }
-
-    /* ── DRAWER PARENT (hlavné sekcie – nerozbaľovacie) ── */
-    .drawer-parent {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 20px 2px;
-      font-size: 9px;
-      font-weight: 700;
-      color: rgba(123,130,168,0.5);
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      background: none;
-      border-top: none;
-      margin-top: 0;
-      cursor: default;
-    }
-    .drawer-parent svg { display: none; }
-
-    /* ── COLLAPSIBLE GROUP TOGGLE (hlavné rozbaľovacie) ── */
-    .drawer-group-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 20px;
-      cursor: pointer;
       color: var(--muted);
-      font-size: 15px;
+      white-space: nowrap;
+    }
+    .topbar-sep {
+      font-size: 13px;
+      color: var(--stroke);
+    }
+    .topbar-page {
+      font-size: 14px;
       font-weight: 600;
-      border: none;
-      border-left: 4px solid transparent;
-      background: none;
-      width: 100%;
-      text-align: left;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      letter-spacing: 0;
-      border-radius: 0;
-      margin-bottom: 0;
-    }
-    .drawer-group-toggle:hover { background: rgba(124,90,246,0.07); color: var(--ink); border-left-color: rgba(124,90,246,0.3); }
-    .drawer-group-toggle.active {
-      color: #fff;
-      background: rgba(124,90,246,0.12);
-      border-left: 4px solid var(--accentR);
-      padding-left: 20px;
-      border-radius: 0;
-    }
-    .drawer-group-toggle .gtitle { display: flex; align-items: center; gap: 10px; }
-    .drawer-group-toggle .gtitle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; opacity: 0.7; }
-    .drawer-group-toggle.active .gtitle svg { opacity: 1; color: var(--accentR); }
-    .drawer-group-toggle .chevron {
-      width: 17px; height: 17px;
-      transition: transform 0.2s;
-      flex-shrink: 0;
-      color: var(--muted);
-      stroke: var(--muted) !important;
-    }
-    .drawer-group-toggle.open .chevron { transform: rotate(180deg); }
-
-    .drawer-group-items {
-      max-height: 0;
+      color: var(--ink);
+      white-space: nowrap;
       overflow: hidden;
-      background: rgba(0,0,0,0.12);
-      padding-left: 0;
-      transition: max-height 0.25s ease;
+      text-overflow: ellipsis;
     }
-    .drawer-group-items.open { max-height: 400px; }
 
-    /* ── PAGES ── */
-    .page { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
+    .topbar-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124,90,246,0.1);
+      border: 1px solid rgba(124,90,246,0.2);
+      border-radius: 999px;
+      padding: 5px 12px 5px 8px;
+      flex-shrink: 0;
+    }
+    .topbar-badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--win);
+      box-shadow: 0 0 8px rgba(34,197,94,0.6);
+    }
+    .topbar-badge span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink2);
+      letter-spacing: 0.3px;
+    }
+
+    /* ═══════════════════════════════════════════
+       PAGES / CONTENT
+    ═══════════════════════════════════════════ */
+    .content {
+      flex: 1;
+      padding: 28px 28px;
+      max-width: 800px;
+    }
+    @media (max-width: 767px) {
+      .content { padding: 20px 16px; }
+    }
+
+    .page { display: none; }
     .page.active { display: block; }
     #page-liga, #page-hist-table { padding: 0; max-width: none; }
 
-    /* ── PAGE TITLE ── */
+    /* ── Page Header ── */
+    .page-header {
+      margin-bottom: 28px;
+    }
+    .page-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
     .page-title {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 20px;
-      letter-spacing: 2px;
+      font-family: "Barlow Condensed", "Bebas Neue", sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--ink);
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+    .page-title span {
+      color: transparent;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent3) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: rgba(19, 21, 46, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--stroke2);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .card-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
       color: var(--muted);
       text-transform: uppercase;
       margin-bottom: 14px;
     }
-    .page-title span { color: var(--ink); }
-
-    /* ── TAB TOGGLE ── */
-    .tab-toggle {
-      display: flex;
-      gap: 6px;
+    /* Legacy alias used in stats.js */
+    .card-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
       margin-bottom: 14px;
     }
-    .tab-btn {
-      flex: 1;
-      padding: 8px 0;
-      border-radius: 12px;
-      border: 1px solid rgba(124,90,246,0.2);
-      background: rgba(124,90,246,0.05);
-      color: var(--muted);
-      font-family: "Outfit", sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
+
+    /* ── HOME ── */
+    .home-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
-    .tab-btn.active {
-      background: var(--accentR);
-      border-color: var(--accentR);
-      color: #fff;
+    @media (max-width: 600px) {
+      .home-grid { grid-template-columns: 1fr; }
     }
 
-    /* ── IFRAME ── */
-    .iframe-wrap {
-      overflow: hidden;
-      border-top: 1px solid var(--stroke);
-      background: #fff;
-      position: relative;
-    }
-    .iframe-wrap iframe {
-      display: block;
-      width: 100%;
-      height: calc(100vh - 80px);
-      border: none;
-    }
-    .iframe-loader {
-      position: absolute;
-      inset: 0;
-      background: var(--bg);
+    .league-card {
+      background: rgba(19, 21, 46, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--stroke2);
+      border-radius: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .league-card:hover {
+      border-color: rgba(124,90,246,0.35);
+      transform: translateY(-1px);
+    }
+    .league-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .league-card-name {
+      font-family: "Outfit", sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .league-card-name span {
+      color: transparent;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .league-card-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(124,90,246,0.12);
+      border: 1px solid rgba(124,90,246,0.22);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .league-card-icon svg {
+      width: 18px; height: 18px;
+      stroke: var(--accent2);
+      fill: none; stroke-width: 1.8;
+    }
+
+    .round-pair { display: flex; flex-direction: column; gap: 8px; }
+    .round-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .round-chip.played {
+      background: rgba(34,197,94,0.05);
+      border-color: rgba(34,197,94,0.2);
+    }
+    .round-chip.upcoming {
+      background: rgba(124,90,246,0.05);
+      border-color: rgba(124,90,246,0.2);
+    }
+    .round-chip.played:hover { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); }
+    .round-chip.upcoming:hover { background: rgba(124,90,246,0.1); border-color: rgba(124,90,246,0.4); }
+    .round-chip-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .round-chip.played .round-chip-tag { color: var(--win); }
+    .round-chip.upcoming .round-chip-tag { color: var(--accent2); }
+    .round-chip-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .round-chip-date { font-size: 11px; color: var(--muted); }
+    .round-chip-loading { font-size: 12px; color: var(--muted); padding: 6px 0; }
+
+    .league-card-btn {
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      color: var(--muted);
-      font-size: 13px;
-      z-index: 10;
-      border-radius: 12px;
-    }
-    .iframe-loader.hidden { display: none; }
-    .iframe-fallback {
-      display: none;
-      text-align: center;
-      padding: 40px 16px;
-      color: var(--muted);
-    }
-    .open-link-btn {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 24px;
-      background: var(--accentR);
-      color: #fff;
+      gap: 6px;
+      padding: 9px 0;
       border-radius: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
+      border: 1px solid rgba(124,90,246,0.2);
+      background: none;
+      color: var(--muted);
+      font-family: "Outfit", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.3px;
     }
-    .sheets-wrap {
-      overflow: hidden;
-      border-top: 1px solid var(--stroke);
+    .league-card-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent2);
+      background: rgba(124,90,246,0.07);
     }
-    .sheets-wrap iframe {
-      display: block;
+
+    /* ── SELECT ── */
+    select {
+      font-family: "Outfit", sans-serif;
+      font-size: 15px;
+      padding: 11px 40px 11px 14px;
+      border: 1px solid var(--stroke2);
+      border-radius: 12px;
+      background: var(--card2);
+      color: var(--ink);
       width: 100%;
-      height: calc(100vh - 80px);
-      border: none;
+      margin-bottom: 12px;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7299' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      cursor: pointer;
+    }
+    select:focus { outline: none; border-color: rgba(124,90,246,0.5); }
+
+    /* ── PILLS ── */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+    .pill {
+      background: rgba(124,90,246,0.1);
+      border: 1px solid rgba(124,90,246,0.22);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      font-family: "Outfit", sans-serif;
+      white-space: nowrap;
+      color: var(--accent3);
     }
 
     /* ── LOADING ── */
@@ -379,116 +720,363 @@
       gap: 16px;
     }
     .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(124,90,246,0.2);
-      border-top-color: var(--accentR);
+      width: 32px; height: 32px;
+      border: 2px solid rgba(124,90,246,0.2);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── CARDS ── */
-    .card {
-      background: linear-gradient(135deg, #13152d 0%, #0f112a 100%);
-      border: 1px solid rgba(124,90,246,0.18);
-      border-radius: 20px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,90,246,0.06);
+    /* ── TOGGLE TABS ── */
+    .tab-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
     }
-    .card-title {
+    .tab-btn {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: 12px;
+      border: 1px solid rgba(124,90,246,0.2);
+      background: rgba(124,90,246,0.04);
+      color: var(--muted);
       font-family: "Outfit", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── TOGGLE PILLS ── */
+    .toggle-wrap { display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
+    .toggle-btn {
+      padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(124,90,246,0.22);
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+      font-family: "Outfit", sans-serif; cursor: pointer; transition: all .15s;
+    }
+    .toggle-btn:hover { border-color: var(--accent); color: var(--ink); }
+    .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ── H2H REDESIGN ── */
+    .h2h-selectors {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .h2h-select-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .h2h-vs-badge {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent2);
+      letter-spacing: 2px;
+      text-align: center;
+      padding: 0 4px;
+      margin-top: 22px;
+    }
+
+    .h2h-hero {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .h2h-player-card {
+      background: rgba(19,21,46,0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--stroke2);
+      border-radius: 18px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      transition: border-color 0.2s;
+    }
+    .h2h-player-card.right { align-items: flex-end; }
+    .h2h-player-card.winner { border-color: rgba(124,90,246,0.5); box-shadow: 0 0 24px rgba(124,90,246,0.15); }
+
+    .h2h-player-avatar {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(124,90,246,0.3), rgba(167,139,250,0.15));
+      border: 1px solid rgba(124,90,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent2);
+      letter-spacing: 1px;
+    }
+    .h2h-player-name {
+      display: none;
+    }
+    .h2h-player-wr {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: "Barlow Condensed", sans-serif;
+      color: var(--accent2);
+      line-height: 1;
+    }
+    .h2h-player-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .h2h-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .h2h-vs-center {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 3px;
+      opacity: 0.5;
+    }
+
+    /* Stat rows inside player card */
+    .h2h-stat-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      margin: 8px 0;
+      border-top: 1px solid var(--stroke);
+      border-bottom: 1px solid var(--stroke);
+      padding: 10px 0;
+    }
+    .h2h-stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .h2h-stat-row.right {
+      flex-direction: row-reverse;
+    }
+    .h2h-stat-label {
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 1px;
       color: var(--muted);
       text-transform: uppercase;
-      margin-bottom: 12px;
     }
-
-    /* ── SELECT ── */
-    select {
-      font-family: "Outfit", sans-serif;
-      font-size: 16px;
-      padding: 12px 14px;
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      background: var(--card);
-      border-color: rgba(124,90,246,0.2);
+    .h2h-stat-val {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 20px;
+      font-weight: 800;
       color: var(--ink);
-      width: 100%;
-      margin-bottom: 12px;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aab1ba' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 36px;
+      line-height: 1;
     }
+    .h2h-stat-val.highlight { color: var(--accent2); }
 
-    /* ── PILLS ── */
-    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .pill {
-      background: rgba(124,90,246,0.10);
-      border: 1px solid rgba(124,90,246,0.22);
-      padding: 6px 12px;
-      border-radius: 999px;
+    /* ── PLAYER HERO ── */
+    .player-select-wrap { margin-bottom: 16px; }
+    .player-select-label {
+      font-size: 10px;
       font-weight: 700;
-      font-size: 13px;
-      font-family: "Outfit", sans-serif;
-      white-space: nowrap;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
     }
 
-    /* ── H2H ── */
+    .player-hero {
+      background: rgba(19,21,46,0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--stroke2);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 6px;
+    }
+    .player-hero-avatar {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(124,90,246,0.3), rgba(167,139,250,0.15));
+      border: 1px solid rgba(124,90,246,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent2);
+      flex-shrink: 0;
+    }
+    .player-hero-info { flex: 1; min-width: 0; }
+    .player-hero-name {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .player-hero-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .player-hero-wr-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .player-hero-wr-ring {
+      position: relative;
+      width: 72px; height: 72px;
+    }
+    .wr-ring-svg {
+      width: 72px; height: 72px;
+      transform: rotate(-90deg);
+    }
+    .wr-ring-bg {
+      fill: none;
+      stroke: rgba(124,90,246,0.12);
+      stroke-width: 6;
+    }
+    .wr-ring-fill {
+      fill: none;
+      stroke: url(#wr-gradient);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 201;
+      stroke-dashoffset: 201;
+      transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+    }
+    .wr-ring-value {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .player-hero-wr-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* Form strip improved */
+    .form-strip {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .form-pip {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff;
+      position: relative;
+    }
+    .form-pip.win { background: var(--win); }
+    .form-pip.loss { background: var(--loss); }
+    .form-pip.draw { background: var(--draw); }
+    .form-pip.unk { background: var(--unk); }
+    .form-pip:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card);
+      border: 1px solid var(--stroke2);
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      white-space: nowrap;
+      color: var(--ink2);
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .h2h-hero { grid-template-columns: 1fr; }
+      .h2h-center { flex-direction: row; justify-content: center; }
+      .h2h-selectors { grid-template-columns: 1fr; }
+      .h2h-vs-badge { margin-top: 0; }
+      .player-hero { flex-wrap: wrap; }
+    }
+
+    /* ── H2H STATS ── */
     .h2h-players { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .player-box { padding: 12px; border: 1px solid rgba(124,90,246,0.18); border-radius: 16px; background: linear-gradient(135deg, #13152d 0%, #0f112a 100%); }
-    .player-box .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
-    .player-box .name { font-size: 17px; font-weight: 700; margin-top: 2px; }
+    .player-box { padding: 14px; border: 1px solid var(--stroke2); border-radius: 14px; background: var(--card2); }
+    .player-box .label { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .player-box .name { font-size: 17px; font-weight: 700; }
 
     .stat-row { margin: 12px 0; }
-    .stat-row-title {
-      text-align: center; font-size: 11px; font-weight: 700;
-      letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
-    }
+    .stat-row-title { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
     .stat-row-grid { display: grid; grid-template-columns: 64px 1fr 64px; gap: 10px; align-items: center; }
     .val { font-size: 20px; font-weight: 700; text-align: center; }
-    .track {
-      position: relative; height: 14px; background: rgba(124,90,246,0.08);
-      border-radius: 999px; overflow: hidden; border: 1px solid rgba(124,90,246,0.12);
-    }
+    .track { position: relative; height: 12px; background: rgba(124,90,246,0.08); border-radius: 999px; overflow: hidden; border: 1px solid rgba(124,90,246,0.1); }
     .bar-left, .bar-right { position: absolute; top: 0; bottom: 0; width: 50%; }
-    .bar-left { right: 50%; background: var(--accentL); border-radius: 999px 0 0 999px; }
-    .bar-right { left: 50%; background: var(--accentR); border-radius: 0 999px 999px 0; }
+    .bar-left { right: 50%; background: rgba(238,240,255,0.5); border-radius: 999px 0 0 999px; }
+    .bar-right { left: 50%; background: var(--accent); border-radius: 0 999px 999px 0; }
 
-    /* ── PLAYER STATS ── */
+    /* ── PLAYER STAT BOXES ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .stat-box { background: linear-gradient(135deg, #13152d 0%, #0f112a 100%); border: 1px solid rgba(124,90,246,0.18); border-radius: 16px; padding: 12px; text-align: center; }
-    .stat-box .label { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; font-family: "Outfit", sans-serif; }
-    .stat-box .value { font-size: 22px; font-weight: 700; color: var(--accentR); }
+    .stat-box { background: var(--card2); border: 1px solid var(--stroke2); border-radius: 14px; padding: 14px; text-align: center; }
+    .stat-box .label { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-box .value { font-size: 22px; font-weight: 700; color: var(--accent2); }
 
-    .form-boxes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-    .box { width: 30px; height: 30px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; }
+    .form-boxes { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .box { width: 28px; height: 28px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; }
     .box.win { background: var(--win); }
     .box.draw { background: var(--draw); }
     .box.loss { background: var(--loss); }
     .box.unk { background: var(--unk); }
 
     .opps-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .opp-card { background: rgba(124,90,246,0.06); border: 1px solid rgba(124,90,246,0.15); border-radius: 16px; padding: 12px 10px; text-align: center; }
-    .opp-name { display: block; font-size: 14px; font-weight: 700; }
+    .opp-card { background: rgba(124,90,246,0.05); border: 1px solid rgba(124,90,246,0.14); border-radius: 14px; padding: 12px 10px; text-align: center; }
+    .opp-name { display: block; font-size: 13px; font-weight: 700; }
     .opp-count { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .opp-wpr { display: flex; justify-content: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-    .wpr { min-width: 36px; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 12px; color: #fff; text-align: center; }
+    .opp-wpr { display: flex; justify-content: center; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+    .wpr { min-width: 34px; padding: 3px 6px; border-radius: 6px; font-weight: 800; font-size: 11px; color: #fff; text-align: center; }
     .wpr.win { background: var(--win); }
     .wpr.loss { background: var(--loss); }
     .wpr.draw { background: var(--draw); }
 
-    .wr-good { color: var(--wr-good); }
-    .wr-mid  { color: var(--wr-mid); }
-    .wr-bad  { color: var(--wr-bad); }
+    .wr-good { color: var(--win); }
+    .wr-mid  { color: var(--draw); }
+    .wr-bad  { color: var(--loss); }
 
-    .avg-bar { height: 14px; background: rgba(124,90,246,0.1); border: 1px solid rgba(124,90,246,0.15); border-radius: 999px; overflow: hidden; }
-    .avg-fill { height: 100%; background: linear-gradient(90deg, #7c5af6, #a78bfa); transition: width 300ms ease; }
+    .avg-bar { height: 12px; background: rgba(124,90,246,0.08); border: 1px solid rgba(124,90,246,0.12); border-radius: 999px; overflow: hidden; }
+    .avg-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 300ms ease; }
     .avg-value { margin-top: 6px; color: var(--muted); font-size: 13px; text-align: center; }
 
     .period-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
@@ -497,272 +1085,366 @@
 
     .error { color: #ff8a8a; text-align: center; padding: 16px 0; }
 
-    /* ── HOME PAGE ── */
-    .home-league-card {
-      background: linear-gradient(135deg, #13152d 0%, #0f112a 100%);
-      border: 1px solid rgba(124,90,246,0.18);
-      border-radius: 20px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,90,246,0.06);
-    }
-    .home-league-title {
-      font-family: "Outfit", sans-serif;
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: var(--ink);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .home-league-title span { color: var(--accentR); }
-    .home-rounds {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .home-round {
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid var(--stroke);
-    }
-    .home-round.played { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.25); }
-    .home-round.upcoming { background: rgba(124,90,246,0.07); border-color: rgba(124,90,246,0.25); }
-    a.home-round.clickable { display: block; text-decoration: none; cursor: pointer; transition: border-color .2s, background .2s; }
-    a.home-round.upcoming.clickable:hover { background: rgba(124,90,246,0.14); border-color: var(--accentR); }
-    a.home-round.played.clickable:hover { background: rgba(34,197,94,0.12); border-color: var(--win); }
-    .hr-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .home-round.played .hr-label { color: var(--win); }
-    .home-round.upcoming .hr-label { color: var(--accentR); }
-    .hr-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
-    .hr-date { font-size: 11px; color: var(--muted); }
-    .home-round-loading { color: var(--muted); font-size: 12px; padding: 8px 0; }
-    .home-view-btn {
-      display: block;
-      margin-top: 12px;
-      padding: 8px 0;
-      background: none;
-      border: 1px solid rgba(124,90,246,0.25);
-      border-radius: 12px;
-      color: var(--muted);
-      font-family: "Outfit", sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+    /* ── IFRAME PAGES ── */
+    #page-liga, #page-hist-table {
       width: 100%;
-      letter-spacing: 0.5px;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
     }
-    .home-view-btn:hover { border-color: var(--accentR); color: var(--accentR); background: rgba(124,90,246,0.06); }
-
-    /* ── STATS TOGGLE ── */
-    .toggle-wrap { display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
-    .toggle-btn {
-      padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(124,90,246,0.25);
-      background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
-      font-family: "Outfit", sans-serif;
-      cursor: pointer; transition: all .15s;
+    .iframe-wrap { position: relative; border-top: 1px solid var(--stroke); background: #fff; }
+    .iframe-wrap iframe { display: block; width: 100%; height: calc(100vh - var(--header-h)); border: none; }
+    .iframe-loader {
+      position: absolute; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; color: var(--muted); font-size: 13px; z-index: 10;
     }
-    .toggle-btn:hover { border-color: var(--accentR); color: var(--ink); }
-    .toggle-btn.active { background: var(--accentR); border-color: var(--accentR); color: #fff; }
+    .iframe-loader.hidden { display: none; }
+    .iframe-fallback { display: none; text-align: center; padding: 40px 16px; color: var(--muted); }
+    .open-link-btn { display: inline-block; margin-top: 12px; padding: 10px 24px; background: var(--accent); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; }
+    .sheets-wrap { overflow: hidden; border-top: 1px solid var(--stroke); }
+    .sheets-wrap iframe { display: block; width: 100%; height: calc(100vh - var(--header-h)); border: none; }
 
     @media (max-width: 480px) {
       .opps-wrap { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
     }
+
+    /* PAGE TRANSITIONS */
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page.active { animation: pageIn 0.32s cubic-bezier(.4,0,.2,1) both; }
+    .page.active.content > * { animation: pageIn 0.38s cubic-bezier(.4,0,.2,1) both; }
+    .page.active.content > *:nth-child(1) { animation-delay: 0.04s; }
+    .page.active.content > *:nth-child(2) { animation-delay: 0.09s; }
+    .page.active.content > *:nth-child(3) { animation-delay: 0.14s; }
+    .page.active.content > *:nth-child(4) { animation-delay: 0.19s; }
+
+    /* HOME CARD STAGGER */
+    .home-grid .league-card { animation: pageIn 0.4s cubic-bezier(.4,0,.2,1) both; }
+    .home-grid .league-card:nth-child(1) { animation-delay: 0.08s; }
+    .home-grid .league-card:nth-child(2) { animation-delay: 0.14s; }
+    .home-grid .league-card:nth-child(3) { animation-delay: 0.20s; }
+    .home-grid .league-card:nth-child(4) { animation-delay: 0.26s; }
+
+    /* NAV ICON GLOW */
+    .nav-group-btn:hover .gicon { box-shadow: 0 0 14px rgba(124,90,246,0.35); }
+    .nav-group-btn.active-page .gicon {
+      background: rgba(124,90,246,0.22);
+      border-color: rgba(124,90,246,0.45);
+      box-shadow: 0 0 14px rgba(124,90,246,0.35);
+    }
+    .nav-group-btn.active-page .gicon svg { filter: drop-shadow(0 0 4px rgba(167,139,250,0.7)); }
+
+    /* ACTIVE INDICATOR SLIDE IN */
+    @keyframes slideIn {
+      from { transform: translateY(-50%) scaleY(0); opacity: 0; }
+      to   { transform: translateY(-50%) scaleY(1); opacity: 1; }
+    }
+    .nav-group-btn.active-page::before { animation: slideIn 0.25s cubic-bezier(.4,0,.2,1) both; }
+
+    /* DOT PULSE */
+    @keyframes dotPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(124,90,246,0.5); }
+      50%       { box-shadow: 0 0 0 4px rgba(124,90,246,0); }
+    }
+    .nav-sub-item.active .dot { animation: dotPulse 2s ease infinite; }
+
+    /* DUOTONE ICON LAYERS */
+    .gicon .ico-fill { fill: rgba(167,139,250,0.22); stroke: none; }
+    .gicon .ico-stroke { fill: none; stroke: var(--accent2); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-group-btn:hover .ico-stroke,
+    .nav-group-btn.active-page .ico-stroke { stroke: var(--accent3); }
+    .nav-group-btn:hover .ico-fill,
+    .nav-group-btn.active-page .ico-fill { fill: rgba(167,139,250,0.4); }
   </style>
 </head>
 <body>
 
-  <!-- DRAWER OVERLAY -->
-  <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<!-- SVG gradient defs for WR ring (referenced by CSS url(#wr-gradient)) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="wr-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--accent)"/>
+      <stop offset="100%" stop-color="var(--accent2)"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-  <!-- SIDE DRAWER -->
-  <nav class="drawer" id="drawer">
-    <div class="drawer-header">
-      <img src="loga/atlatszo logo kicsi.png" alt="DC Šaľa" style="height:72px;display:block;margin-bottom:8px;background:#fff;border-radius:10px;padding:6px;">
-      <div class="drawer-logo">Darts Club <span>Šaľa</span></div>
-      <div class="drawer-sub">Štatistiky &amp; výsledky</div>
+<!-- ATMOSPHERIC BACKGROUND -->
+<div class="bg-canvas">
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+  <div class="glow-orb glow-orb-3"></div>
+  <div class="bg-noise"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="loga/atlatszo logo kicsi.png" alt="DC Šaľa" class="sidebar-logo-img">
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name">Darts Club <span>Šaľa</span></div>
+      <div class="sidebar-brand-sub">Štatistiky &amp; výsledky</div>
     </div>
+  </div>
 
-    <div class="drawer-section">
-      <button class="drawer-group-toggle active" id="nav-home" onclick="navTo('home',null,this)" style="font-size:15px;">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Domov
-        </span>
-      </button>
-    </div>
+  <div class="sidebar-nav">
 
-    <div class="drawer-section">
-      <div class="drawer-parent">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Aktuálna sezóna
-      </div>
-      <!-- 1. Liga toggle -->
-      <button class="drawer-group-toggle" id="grp-prva" onclick="toggleGroup('prva')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          1. Liga
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="drawer-group-items" id="grpitems-prva">
-        <button class="drawer-item" id="nav-prva-rank" onclick="navTo('prva','rank',this)">
-          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Tabuľka
-        </button>
-        <button class="drawer-item" id="nav-prva-stats" onclick="navTo('prva','stats',this)">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          Štatistiky
-        </button>
-      </div>
-
-      <!-- Open liga toggle -->
-      <button class="drawer-group-toggle" id="grp-open" onclick="toggleGroup('open')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Open liga
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="drawer-group-items" id="grpitems-open">
-        <button class="drawer-item" id="nav-open-rank" onclick="navTo('open','rank',this)">
-          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Tabuľka
-        </button>
-        <button class="drawer-item" id="nav-open-stats" onclick="navTo('open','stats',this)">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          Štatistiky
-        </button>
-      </div>
-
-      <!-- Ženská liga toggle -->
-      <button class="drawer-group-toggle" id="grp-zenska" onclick="toggleGroup('zenska')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>
-          Ženská liga
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="drawer-group-items" id="grpitems-zenska">
-        <button class="drawer-item" id="nav-zenska-rank" onclick="navTo('zenska','rank',this)">
-          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Tabuľka
-        </button>
-        <button class="drawer-item" id="nav-zenska-stats" onclick="navTo('zenska','stats',this)">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          Štatistiky
-        </button>
-      </div>
-    </div>
-
-    <div class="drawer-section">
-      <div class="drawer-parent">
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Predošlé sezóny
-      </div>
-
-      <!-- 1. Liga toggle -->
-      <button class="drawer-group-toggle" id="grp-hist-prva" onclick="toggleGroup('hist-prva')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          1. Liga
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="drawer-group-items" id="grpitems-hist-prva"></div>
-
-      <!-- Open liga toggle -->
-      <button class="drawer-group-toggle" id="grp-hist-open" onclick="toggleGroup('hist-open')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Open liga
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="drawer-group-items" id="grpitems-hist-open"></div>
-
-      <!-- Historická tabuľka -->
-      <button class="drawer-group-toggle" id="nav-hist-table" onclick="navTo('hist-table',null,this)">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
-          Historická tabuľka
+    <!-- Domov -->
+    <div class="nav-section">
+      <button class="nav-group-btn active-page" id="nav-home" onclick="navTo('home',null,this)">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <polygon class="ico-fill" points="12 2 3 10 3 21 9 21 9 15 15 15 15 21 21 21 21 10"/>
+              <polygon class="ico-stroke" points="12 2 3 10 3 21 9 21 9 15 15 15 15 21 21 21 21 10"/>
+              <polyline class="ico-stroke" points="9 21 9 15 15 15 15 21"/>
+            </svg>
+          </span>
+          <span class="glabel">Domov</span>
         </span>
       </button>
     </div>
 
-    <div class="drawer-section">
-      <button class="drawer-group-toggle" id="grp-stats" onclick="toggleGroup('stats')">
-        <span class="gtitle">
-          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Štatistiky
+    <!-- Aktuálna sezóna -->
+    <div class="nav-section">
+      <div class="nav-section-label">Aktuálna sezóna</div>
+
+      <button class="nav-group-btn" id="grp-prva" onclick="toggleGroup('prva')">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <path class="ico-fill" d="M6 3h12v8a6 6 0 0 1-12 0V3z"/>
+              <path class="ico-stroke" d="M6 3h12v8a6 6 0 0 1-12 0V3z"/>
+              <path class="ico-stroke" d="M4 3H2v4a4 4 0 0 0 4 4M20 3h2v4a4 4 0 0 1-4 4"/>
+              <line class="ico-stroke" x1="12" y1="17" x2="12" y2="21"/>
+              <path class="ico-stroke" d="M8 21h8"/>
+            </svg>
+          </span>
+          <span class="glabel">1. Liga</span>
         </span>
         <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="drawer-group-items" id="grpitems-stats">
-      <button class="drawer-item" id="nav-h2h" onclick="navTo('h2h',null,this)">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        H2H – Prvá liga
+      <div class="nav-group-items" id="grpitems-prva">
+        <button class="nav-sub-item" id="nav-prva-rank" onclick="navTo('prva','rank',this)"><span class="dot"></span>Tabuľka</button>
+        <button class="nav-sub-item" id="nav-prva-stats" onclick="navTo('prva','stats',this)"><span class="dot"></span>Štatistiky</button>
+      </div>
+
+      <button class="nav-group-btn" id="grp-open" onclick="toggleGroup('open')">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <circle class="ico-fill" cx="10" cy="13" r="6"/>
+              <circle class="ico-stroke" cx="10" cy="13" r="6"/>
+              <circle class="ico-stroke" cx="10" cy="13" r="3"/>
+              <circle class="ico-fill" cx="10" cy="13" r="1"/>
+              <line class="ico-stroke" x1="14" y1="9" x2="21" y2="3"/>
+              <polyline class="ico-stroke" points="18 3 21 3 21 6"/>
+            </svg>
+          </span>
+          <span class="glabel">Open liga</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <button class="drawer-item" id="nav-player" onclick="navTo('player',null,this)">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Hráč
+      <div class="nav-group-items" id="grpitems-open">
+        <button class="nav-sub-item" id="nav-open-rank" onclick="navTo('open','rank',this)"><span class="dot"></span>Tabuľka</button>
+        <button class="nav-sub-item" id="nav-open-stats" onclick="navTo('open','stats',this)"><span class="dot"></span>Štatistiky</button>
+      </div>
+
+      <button class="nav-group-btn" id="grp-zenska" onclick="toggleGroup('zenska')">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <polygon class="ico-fill" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>
+              <polygon class="ico-stroke" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>
+            </svg>
+          </span>
+          <span class="glabel">Ženská liga</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <a class="drawer-item" href="slim_builder.html" target="_blank" style="text-decoration:none;">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        JSON Builder
+      <div class="nav-group-items" id="grpitems-zenska">
+        <button class="nav-sub-item" id="nav-zenska-rank" onclick="navTo('zenska','rank',this)"><span class="dot"></span>Tabuľka</button>
+        <button class="nav-sub-item" id="nav-zenska-stats" onclick="navTo('zenska','stats',this)"><span class="dot"></span>Štatistiky</button>
+      </div>
+    </div>
+
+    <!-- Predošlé sezóny -->
+    <div class="nav-section">
+      <div class="nav-section-label">Predošlé sezóny</div>
+
+      <button class="nav-group-btn" id="grp-hist-prva" onclick="toggleGroup('hist-prva')">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <circle class="ico-fill" cx="12" cy="15" r="6"/>
+              <circle class="ico-stroke" cx="12" cy="15" r="6"/>
+              <circle class="ico-stroke" cx="12" cy="15" r="3"/>
+              <polyline class="ico-stroke" points="8.21 6.79 7 3 3 5l3.27 4.91"/>
+              <polyline class="ico-stroke" points="15.79 6.79 17 3 21 5l-3.27 4.91"/>
+            </svg>
+          </span>
+          <span class="glabel">1. Liga</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="nav-group-items" id="grpitems-hist-prva"></div>
+
+      <button class="nav-group-btn" id="grp-hist-open" onclick="toggleGroup('hist-open')">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <circle class="ico-fill" cx="12" cy="12" r="9"/>
+              <circle class="ico-stroke" cx="12" cy="12" r="9"/>
+              <line class="ico-stroke" x1="3" y1="12" x2="21" y2="12"/>
+              <path class="ico-stroke" d="M12 3a14 14 0 0 1 3.5 9 14 14 0 0 1-3.5 9 14 14 0 0 1-3.5-9A14 14 0 0 1 12 3z"/>
+            </svg>
+          </span>
+          <span class="glabel">Open liga</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="nav-group-items" id="grpitems-hist-open"></div>
+
+      <button class="nav-group-btn" id="nav-hist-table" onclick="navTo('hist-table',null,this)">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <rect class="ico-fill" x="2" y="13" width="5" height="8" rx="1"/>
+              <rect class="ico-fill" x="9" y="9" width="5" height="12" rx="1"/>
+              <rect class="ico-fill" x="16" y="5" width="5" height="16" rx="1"/>
+              <rect class="ico-stroke" x="2" y="13" width="5" height="8" rx="1"/>
+              <rect class="ico-stroke" x="9" y="9" width="5" height="12" rx="1"/>
+              <rect class="ico-stroke" x="16" y="5" width="5" height="16" rx="1"/>
+            </svg>
+          </span>
+          <span class="glabel">Historická tabuľka</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Štatistiky -->
+    <div class="nav-section">
+      <div class="nav-section-label">Štatistiky</div>
+
+      <button class="nav-group-btn" id="nav-h2h" onclick="navTo('h2h',null,this)">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <line class="ico-stroke" x1="4" y1="20" x2="20" y2="4"/>
+              <path class="ico-stroke" d="M16 4h4v4L4 20l-4 0 0-4z"/>
+              <line class="ico-stroke" x1="4" y1="4" x2="20" y2="20"/>
+              <path class="ico-stroke" d="M8 20h-4v-4L20 4l4 0 0 4z"/>
+            </svg>
+          </span>
+          <span class="glabel">H2H – Prvá liga</span>
+        </span>
+      </button>
+
+      <button class="nav-group-btn" id="nav-player" onclick="navTo('player',null,this)">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <rect class="ico-fill" x="2" y="4" width="20" height="16" rx="3"/>
+              <rect class="ico-stroke" x="2" y="4" width="20" height="16" rx="3"/>
+              <circle class="ico-stroke" cx="8" cy="12" r="3"/>
+              <line class="ico-stroke" x1="14" y1="10" x2="20" y2="10"/>
+              <line class="ico-stroke" x1="14" y1="14" x2="18" y2="14"/>
+            </svg>
+          </span>
+          <span class="glabel">Hráč</span>
+        </span>
+      </button>
+
+      <a class="nav-group-btn" href="slim_builder.html" target="_blank" style="text-decoration:none; display:flex; align-items:center; justify-content:space-between;">
+        <span class="ginner">
+          <span class="gicon">
+            <svg viewBox="0 0 24 24">
+              <path class="ico-fill" d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              <path class="ico-stroke" d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </span>
+          <span class="glabel">JSON Builder</span>
+        </span>
+        <svg style="width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0;" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
-      </div>
     </div>
-  </nav>
 
-  <!-- HEADER -->
-  <header class="app-header">
+  </div><!-- end sidebar-nav -->
+
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-text">DC Šaľa <span>·</span> Sezóna 2024/25</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div class="main-wrap">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
     <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
-    <img src="loga/atlatszo logo kicsi.png" alt="DC Šaľa" style="height:36px;background:#fff;border-radius:8px;padding:3px;">
-    <div>
-      <div class="app-logo">Darts Club <span>Šaľa</span></div>
-      <div class="app-logo-sub" id="header-sub">1. Liga · Tabuľka</div>
+    <div class="topbar-breadcrumb">
+      <span class="topbar-section" id="topbar-section">Domov</span>
+      <span class="topbar-sep" id="topbar-sep" style="display:none">›</span>
+      <span class="topbar-page" id="topbar-page"></span>
+    </div>
+    <div class="topbar-badge">
+      <div class="topbar-badge-dot"></div>
+      <span>Sezóna aktívna</span>
     </div>
   </header>
 
   <!-- PAGES -->
 
-  <!-- HOME PAGE -->
-  <div id="page-home" class="page active">
-    <div class="home-league-card" id="home-card-letna">
-      <div class="home-league-title">Letná <span>liga</span></div>
-      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
+  <!-- HOME -->
+  <div id="page-home" class="page active content">
+    <div class="page-header">
+      <div class="page-eyebrow">Prehľad</div>
+      <div class="page-title">Aktuálne <span>kola</span></div>
     </div>
-    <div class="home-league-card" id="home-card-prva">
-      <div class="home-league-title">1. <span>Liga</span></div>
-      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
-      <button class="home-view-btn" onclick="navTo('prva','rank',null)">Otvoriť ligu →</button>
-    </div>
-    <div class="home-league-card" id="home-card-open">
-      <div class="home-league-title">Open <span>liga</span></div>
-      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
-      <button class="home-view-btn" onclick="navTo('open','rank',null)">Otvoriť ligu →</button>
-    </div>
-    <div class="home-league-card" id="home-card-zenska">
-      <div class="home-league-title">Ženská <span>liga</span></div>
-      <div class="home-rounds"><div class="home-round-loading">Načítavam...</div></div>
-      <button class="home-view-btn" onclick="navTo('zenska','rank',null)">Otvoriť ligu →</button>
+    <div class="home-grid">
+      <div class="league-card" id="home-card-letna">
+        <div class="league-card-head">
+          <div class="league-card-name">Letná <span>liga</span></div>
+          <div class="league-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+        </div>
+        <div class="round-pair"><div class="round-chip-loading">Načítavam...</div></div>
+      </div>
+      <div class="league-card" id="home-card-prva">
+        <div class="league-card-head">
+          <div class="league-card-name">1. <span>Liga</span></div>
+          <div class="league-card-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        </div>
+        <div class="round-pair"><div class="round-chip-loading">Načítavam...</div></div>
+        <button class="league-card-btn" onclick="navTo('prva','rank',null)">Otvoriť ligu →</button>
+      </div>
+      <div class="league-card" id="home-card-open">
+        <div class="league-card-head">
+          <div class="league-card-name">Open <span>liga</span></div>
+          <div class="league-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        </div>
+        <div class="round-pair"><div class="round-chip-loading">Načítavam...</div></div>
+        <button class="league-card-btn" onclick="navTo('open','rank',null)">Otvoriť ligu →</button>
+      </div>
+      <div class="league-card" id="home-card-zenska">
+        <div class="league-card-head">
+          <div class="league-card-name">Ženská <span>liga</span></div>
+          <div class="league-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg></div>
+        </div>
+        <div class="round-pair"><div class="round-chip-loading">Načítavam...</div></div>
+        <button class="league-card-btn" onclick="navTo('zenska','rank',null)">Otvoriť ligu →</button>
+      </div>
     </div>
   </div>
 
-  <!-- LIGA PAGE -->
+  <!-- LIGA (iframe) -->
   <div id="page-liga" class="page">
     <div class="iframe-wrap" id="iframe-wrap">
       <div class="iframe-loader" id="iframe-loader">
@@ -781,7 +1463,7 @@
     </div>
   </div>
 
-  <!-- HISTORICKÁ TABUĽKA PAGE -->
+  <!-- HIST TABLE -->
   <div id="page-hist-table" class="page">
     <div class="sheets-wrap">
       <iframe
@@ -791,46 +1473,143 @@
     </div>
   </div>
 
-  <!-- H2H PAGE -->
-  <div id="page-h2h" class="page">
-    <div id="h2h-loading" class="loading">
-      <div class="spinner"></div>
-      <div>Načítavam dáta...</div>
+  <!-- H2H -->
+  <div id="page-h2h" class="page content">
+    <div class="page-header">
+      <div class="page-eyebrow">Štatistiky</div>
+      <div class="page-title">Head <span>to Head</span></div>
     </div>
+    <div id="h2h-loading" class="loading"><div class="spinner"></div><div>Načítavam dáta...</div></div>
     <div id="h2h-content" style="display:none">
-      <div class="card-title">Vyber hráčov</div>
-      <select id="p1"></select>
-      <select id="p2"></select>
-      <div class="card">
-        <div class="h2h-players">
-          <div class="player-box">
-            <div class="label">Hráč 1</div>
-            <div class="name" id="nameL">-</div>
+
+      <!-- Player selectors -->
+      <div class="h2h-selectors">
+        <div class="h2h-select-wrap">
+          <div class="h2h-select-label">Hráč 1</div>
+          <select id="p1"></select>
+        </div>
+        <div class="h2h-vs-badge">VS</div>
+        <div class="h2h-select-wrap">
+          <div class="h2h-select-label">Hráč 2</div>
+          <select id="p2"></select>
+        </div>
+      </div>
+
+      <!-- Player hero cards -->
+      <div class="h2h-hero">
+        <!-- LEFT CARD -->
+        <div class="h2h-player-card" id="h2h-card-left">
+          <div class="h2h-player-avatar" id="h2h-avatar-left">?</div>
+          <div class="h2h-stat-rows">
+            <div class="h2h-stat-row">
+              <span class="h2h-stat-label">Výhry</span>
+              <span class="h2h-stat-val" id="h2h-score-left">0</span>
+            </div>
+            <div class="h2h-stat-row">
+              <span class="h2h-stat-label">Remízy</span>
+              <span class="h2h-stat-val" id="h2h-draws-left">0</span>
+            </div>
+            <div class="h2h-stat-row">
+              <span class="h2h-stat-label">Legy</span>
+              <span class="h2h-stat-val" id="h2h-legs-left">—</span>
+            </div>
+            <div class="h2h-stat-row">
+              <span class="h2h-stat-label">Priemer</span>
+              <span class="h2h-stat-val" id="h2h-avg-left">—</span>
+            </div>
           </div>
-          <div class="player-box">
-            <div class="label">Hráč 2</div>
-            <div class="name" id="nameR">-</div>
+          <div class="h2h-wr-row">
+            <div>
+              <div class="h2h-player-wr" id="h2h-wr-left">—</div>
+              <div class="h2h-player-tag">Win rate</div>
+            </div>
+            <div class="h2h-card-meta" id="h2h-meta-left"></div>
           </div>
         </div>
-        <div id="h2h-pills" class="pill-row"></div>
-        <div id="h2h-rows"></div>
+        <!-- VS -->
+        <div class="h2h-center">
+          <div class="h2h-vs-center">VS</div>
+        </div>
+        <!-- RIGHT CARD -->
+        <div class="h2h-player-card right" id="h2h-card-right">
+          <div class="h2h-player-avatar right" id="h2h-avatar-right">?</div>
+          <div class="h2h-stat-rows">
+            <div class="h2h-stat-row right">
+              <span class="h2h-stat-val" id="h2h-score-right">0</span>
+              <span class="h2h-stat-label">Výhry</span>
+            </div>
+            <div class="h2h-stat-row right">
+              <span class="h2h-stat-val" id="h2h-draws-right">0</span>
+              <span class="h2h-stat-label">Remízy</span>
+            </div>
+            <div class="h2h-stat-row right">
+              <span class="h2h-stat-val" id="h2h-legs-right">—</span>
+              <span class="h2h-stat-label">Legy</span>
+            </div>
+            <div class="h2h-stat-row right">
+              <span class="h2h-stat-val" id="h2h-avg-right">—</span>
+              <span class="h2h-stat-label">Priemer</span>
+            </div>
+          </div>
+          <div class="h2h-wr-row right">
+            <div class="h2h-card-meta right" id="h2h-meta-right"></div>
+            <div style="text-align:right">
+              <div class="h2h-player-wr" id="h2h-wr-right">—</div>
+              <div class="h2h-player-tag">Win rate</div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Pills -->
+      <div id="h2h-pills" class="pill-row"></div>
+
+      <div id="h2h-rows"></div>
+
     </div>
     <div id="h2h-error" class="error"></div>
   </div>
 
-  <!-- PLAYER STATS PAGE -->
-  <div id="page-stats" class="page">
-    <div id="stats-loading" class="loading">
-      <div class="spinner"></div>
-      <div>Načítavam dáta...</div>
+  <!-- PLAYER STATS -->
+  <div id="page-stats" class="page content">
+    <div class="page-header">
+      <div class="page-eyebrow">Štatistiky</div>
+      <div class="page-title">Hráč <span>·</span> Profil</div>
     </div>
+    <div id="stats-loading" class="loading"><div class="spinner"></div><div>Načítavam dáta...</div></div>
     <div id="stats-content" style="display:none">
+
+      <!-- League + season toggles -->
       <div id="stats-toggle" class="toggle-wrap"></div>
-      <div id="stats-season-toggle" class="toggle-wrap" style="margin-top:4px"></div>
-      <div class="card-title" style="margin-top:10px">Vyber hráča</div>
-      <select id="player"></select>
-      <div class="card">
+      <div id="stats-season-toggle" class="toggle-wrap" style="margin-top:6px"></div>
+
+      <!-- Player selector -->
+      <div class="player-select-wrap">
+        <div class="player-select-label">Vyber hráča</div>
+        <select id="player"></select>
+      </div>
+
+      <!-- Player hero header -->
+      <div class="player-hero" id="player-hero" style="display:none">
+        <div class="player-hero-avatar" id="player-hero-avatar">?</div>
+        <div class="player-hero-info">
+          <div class="player-hero-name" id="player-hero-name">—</div>
+          <div class="player-hero-meta" id="player-hero-meta">—</div>
+        </div>
+        <div class="player-hero-wr-wrap">
+          <div class="player-hero-wr-ring">
+            <svg viewBox="0 0 80 80" class="wr-ring-svg">
+              <circle cx="40" cy="40" r="32" class="wr-ring-bg"/>
+              <circle cx="40" cy="40" r="32" class="wr-ring-fill" id="wr-ring-fill"/>
+            </svg>
+            <div class="wr-ring-value" id="player-hero-wr">—</div>
+          </div>
+          <div class="player-hero-wr-label">Win rate</div>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="card" style="margin-top:14px">
         <div id="stats-pills" class="pill-row"></div>
         <div id="stats-grid"></div>
       </div>
@@ -838,328 +1617,292 @@
     <div id="stats-error" class="error"></div>
   </div>
 
-  <script src="data.js"></script>
-  <script src="h2h.js"></script>
-  <script src="stats.js"></script>
-  <script>
-    const LEAGUE_META = {
-      letna:  { label: 'Letná liga'  },
-      prva:   { label: '1. Liga'     },
-      open:   { label: 'Open liga'   },
-      zenska: { label: 'Ženská liga' }
-    };
+</div><!-- end main-wrap -->
 
-    const TAB_LABELS = { rank: "Tabuľka", stats: "Štatistiky" };
+<script src="data.js"></script>
+<script src="h2h.js"></script>
+<script src="stats.js"></script>
+<script>
+  /* ── APP LOGIC ── */
+  const LEAGUE_META = {
+    letna:  { label: 'Letná liga'  },
+    prva:   { label: '1. Liga'     },
+    open:   { label: 'Open liga'   },
+    zenska: { label: 'Ženská liga' }
+  };
+  const TAB_LABELS = { rank: "Tabuľka", stats: "Štatistiky" };
+  let LIGA_URLS = {};
+  let HOME_LEAGUES = [];
 
-    // Načítané dynamicky z aktualnesezony.json
-    let LIGA_URLS = {};
-    let HOME_LEAGUES = [];
+  function lgidFromUrl(url) {
+    const m = url.match(/lgid=(lg_[^&]+)/);
+    return m ? m[1] : null;
+  }
 
-    function lgidFromUrl(url) {
-      const m = url.match(/lgid=(lg_[^&]+)/);
-      return m ? m[1] : null;
+  function buildLigaUrls(cfg) {
+    const urls = {};
+    for (const [key, portalUrl] of Object.entries(cfg)) {
+      const id = lgidFromUrl(portalUrl);
+      urls[key] = {
+        rank:   `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=rank`,
+        stats:  `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=stats`,
+        portal: portalUrl,
+        label:  LEAGUE_META[key]?.label || key,
+        id
+      };
     }
+    return urls;
+  }
 
-    function buildLigaUrls(cfg) {
-      const urls = {};
-      for (const [key, portalUrl] of Object.entries(cfg)) {
-        const id = lgidFromUrl(portalUrl);
-        urls[key] = {
-          rank:   `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=rank`,
-          stats:  `https://n01darts.com/n01/league/l_stats.html?id=${id}&tab=stats`,
-          portal: portalUrl,
-          label:  LEAGUE_META[key]?.label || key,
-          id
-        };
-      }
-      return urls;
+  const HIST_LABELS = { prva: '1. Liga', open: 'Open liga' };
+
+  function buildHistMenu(hist) {
+    for (const [key, seasons] of Object.entries(hist)) {
+      const el = document.getElementById('grpitems-hist-' + key);
+      if (!el) continue;
+      el.innerHTML = seasons.map(s =>
+        `<button class="nav-sub-item" onclick="loadHistSeason('${s.lgid}','${HIST_LABELS[key] || key} · ${s.label}')"><span class="dot"></span>${s.label}</button>`
+      ).join('');
     }
+  }
 
-    const HIST_LABELS = { prva: '1. Liga', open: 'Open liga' };
+  async function initApp() {
+    try {
+      const res = await fetch('aktualnesezony.json?t=' + Date.now());
+      const cfg = await res.json();
+      LIGA_URLS = buildLigaUrls(cfg);
+      HOME_LEAGUES = Object.entries(cfg).map(([key, url]) => ({
+        key, id: lgidFromUrl(url), label: LEAGUE_META[key]?.label || key
+      }));
+    } catch (e) { console.warn('aktualnesezony.json failed', e); }
+    try {
+      const res = await fetch('predoslesezony.json?t=' + Date.now());
+      const hist = await res.json();
+      buildHistMenu(hist);
+    } catch (e) { console.warn('predoslesezony.json failed', e); }
+    loadHomeData();
+  }
 
-    function buildHistMenu(hist) {
-      for (const [key, seasons] of Object.entries(hist)) {
-        const el = document.getElementById('grpitems-hist-' + key);
-        if (!el) continue;
-        el.innerHTML = seasons.map(s =>
-          `<button class="drawer-item" onclick="loadHistSeason('${s.lgid}','${HIST_LABELS[key] || key} · ${s.label}')">${s.label}</button>`
-        ).join('');
-      }
-    }
+  const T_LIST_BASE = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=';
+  function fmtDate(ms) { return new Date(ms).toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+  const T_DETAIL_BASE = 'https://api.n01darts.com/n01/tournament/n01_tournament.php?cmd=get_data&tdid=';
+  function roundNum(title) { const m = title.match(/(\d+)\.\s*[Kk]olo/); return m ? parseInt(m[1]) : 0; }
 
-    async function initApp() {
-      try {
-        const res = await fetch('aktualnesezony.json?t=' + Date.now());
-        const cfg = await res.json();
-        LIGA_URLS = buildLigaUrls(cfg);
-        HOME_LEAGUES = Object.entries(cfg).map(([key, url]) => ({
-          key,
-          id: lgidFromUrl(url),
-          label: LEAGUE_META[key]?.label || key
+  async function fetchWithTimeout(url, ms = 4000) {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), ms);
+    try {
+      const res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!res.ok) throw new Error();
+      return await res.json();
+    } catch { clearTimeout(tid); return null; }
+  }
+
+  async function fetchStatus(tdid) {
+    const d = await fetchWithTimeout(T_DETAIL_BASE + tdid)
+           ?? await fetchWithTimeout(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
+    return d?.status ?? null;
+  }
+
+  async function loadOneLeague(lg) {
+    const card = document.getElementById('home-card-' + lg.key);
+    if (!card) return;
+    try {
+      const url = T_LIST_BASE + lg.id;
+      const data = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 8000);
+      if (!data) throw new Error('Timeout ' + lg.key);
+
+      const rounds = Object.entries(data).map(([tdid, t]) => ({
+        tdid, title: t.title, createTime: t.createTime, updateTime: t.updateTime,
+        num: roundNum(t.title), touched: (t.updateTime / 1000 - t.createTime) > 3600
+      }));
+
+      const touched = rounds.filter(r => r.touched).sort((a, b) => b.num - a.num);
+      const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
+      let last = null, next = null;
+
+      if (touched.length === 0) {
+        next = untouched[0] || null;
+      } else if (touched.length === 1 && untouched.some(r => r.num > touched[0].num)) {
+        next = touched[0]; last = null;
+      } else {
+        const candidates = touched.slice(0, 5);
+        const details = await Promise.allSettled(candidates.map(async r => {
+          const status = await fetchStatus(r.tdid);
+          if (status === null) throw new Error();
+          return { ...r, status };
         }));
-      } catch (e) {
-        console.warn('aktualnesezony.json sa nepodarilo načítať', e);
-      }
-      try {
-        const res = await fetch('predoslesezony.json?t=' + Date.now());
-        const hist = await res.json();
-        buildHistMenu(hist);
-      } catch (e) {
-        console.warn('predoslesezony.json sa nepodarilo načítať', e);
-      }
-      loadHomeData();
-    }
-
-    const T_LIST_BASE = 'https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=';
-
-    function fmtDate(ms) {
-      return new Date(ms).toLocaleDateString('sk-SK', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-
-    const T_DETAIL_BASE = 'https://api.n01darts.com/n01/tournament/n01_tournament.php?cmd=get_data&tdid=';
-
-    function roundNum(title) {
-      const m = title.match(/(\d+)\.\s*[Kk]olo/);
-      return m ? parseInt(m[1]) : 0;
-    }
-
-    async function fetchWithTimeout(url, ms = 4000) {
-      const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), ms);
-      try {
-        const res = await fetch(url, { signal: ctrl.signal });
-        clearTimeout(tid);
-        if (!res.ok) throw new Error();
-        return await res.json();
-      } catch {
-        clearTimeout(tid);
-        return null;
-      }
-    }
-
-    async function fetchStatus(tdid) {
-      const d = await fetchWithTimeout(T_DETAIL_BASE + tdid)
-             ?? await fetchWithTimeout(CORS_PROXY + encodeURIComponent(T_DETAIL_BASE + tdid));
-      return d?.status ?? null;
-    }
-
-    async function loadOneLeague(lg) {
-      const card = document.getElementById('home-card-' + lg.key);
-      if (!card) return;
-      try {
-        const url = T_LIST_BASE + lg.id;
-        const data = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 8000);
-        if (!data) throw new Error('Timeout alebo chyba pri načítaní ligy ' + lg.key);
-
-        const now = Date.now();
-        const rounds = Object.entries(data).map(([tdid, t]) => ({
-          tdid,
-          title: t.title,
-          createTime: t.createTime,
-          updateTime: t.updateTime,
-          num: roundNum(t.title),
-          touched: (t.updateTime / 1000 - t.createTime) > 3600
-        }));
-
-        const touched = rounds.filter(r => r.touched).sort((a, b) => b.num - a.num);
-        let last = null;
-        let next = null;
-
-        const untouched = rounds.filter(r => !r.touched).sort((a, b) => a.num - b.num);
-
-        if (touched.length === 0) {
-          next = untouched[0] || null;
-        } else if (touched.length === 1 && untouched.some(r => r.num > touched[0].num)) {
-          // len 1 touched kolo a su untouched s vyssim cislom = liga este nezacala
-          next = touched[0];
-          last = null;
-        } else {
-          const candidates = touched.slice(0, 5);
-          const details = await Promise.allSettled(
-            candidates.map(async r => {
-              const status = await fetchStatus(r.tdid);
-              if (status === null) throw new Error('chyba');
-              return { ...r, status };
-            })
-          );
-
-          const withStatus = details
-            .filter(r => r.status === 'fulfilled')
-            .map(r => r.value);
-
-          const playedCandidates   = withStatus.filter(r => r.status === 40);
-          const upcomingCandidates = withStatus.filter(r => r.status !== 40);
-
-          if (upcomingCandidates.length > 0) {
-            if (playedCandidates.length > 0) {
-              // aktívna liga – niektoré kolá odohraté, niektoré nie
-              next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
-              const allPlayed = touched.filter(r => {
-                const found = withStatus.find(w => w.tdid === r.tdid);
-                if (found) return found.status === 40;
-                return true;
-              });
-              last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
-            } else {
-              // žiadne potvrdené zahrané kolá → liga ešte nezačala
-              last = null;
-              next = rounds.slice().sort((a, b) => a.num - b.num)[0];
-            }
+        const withStatus = details.filter(r => r.status === 'fulfilled').map(r => r.value);
+        const playedCandidates = withStatus.filter(r => r.status === 40);
+        const upcomingCandidates = withStatus.filter(r => r.status !== 40);
+        if (upcomingCandidates.length > 0) {
+          if (playedCandidates.length > 0) {
+            next = upcomingCandidates.sort((a, b) => a.num - b.num)[0];
+            const allPlayed = touched.filter(r => { const found = withStatus.find(w => w.tdid === r.tdid); return found ? found.status === 40 : true; });
+            last = allPlayed.sort((a, b) => b.num - a.num)[0] || null;
           } else {
-            last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
-            next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
+            last = null; next = rounds.slice().sort((a, b) => a.num - b.num)[0];
           }
-        }
-
-        const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
-        let html = '<div class="home-rounds">';
-        if (last) {
-          html += `<a class="home-round played clickable" href="${tournamentUrl(last.tdid)}" target="_blank" rel="noopener">
-            <div class="hr-label">Posledné kolo</div>
-            <div class="hr-title">${last.title}</div>
-            <div class="hr-date">${fmtDate(last.updateTime)} →</div>
-          </a>`;
-        }
-        if (next) {
-          html += `<a class="home-round upcoming clickable" href="${tournamentUrl(next.tdid)}" target="_blank" rel="noopener">
-            <div class="hr-label">Ďalšie kolo</div>
-            <div class="hr-title">${next.title}</div>
-            <div class="hr-date">Prihlásiť sa →</div>
-          </a>`;
         } else {
-          html += `<div class="home-round upcoming">
-            <div class="hr-label">Ďalšie kolo</div>
-            <div class="hr-title">Čoskoro</div>
-            <div class="hr-date">—</div>
-          </div>`;
+          last = playedCandidates.sort((a, b) => b.num - a.num)[0] || null;
+          next = untouched.find(r => r.num > (last?.num ?? 0)) || untouched[0] || null;
         }
-        html += '</div>';
-        const roundsEl = card.querySelector('.home-rounds');
-        if (roundsEl) roundsEl.outerHTML = html;
-      } catch (e) {
-        console.error('loadOneLeague error:', e);
-        const roundsEl = card.querySelector('.home-rounds');
-        if (roundsEl) roundsEl.innerHTML =
-          '<div class="home-round-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
-      }
-    }
-
-    async function loadHomeData() {
-      await Promise.allSettled(HOME_LEAGUES.map(lg => loadOneLeague(lg)));
-    }
-
-    function toggleDrawer() {
-      const drawer = document.getElementById('drawer');
-      const overlay = document.getElementById('overlay');
-      const hamburger = document.getElementById('hamburger');
-      const isOpen = drawer.classList.contains('open');
-      drawer.classList.toggle('open', !isOpen);
-      overlay.classList.toggle('open', !isOpen);
-      hamburger.classList.toggle('open', !isOpen);
-    }
-
-    function closeDrawer() {
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('overlay').classList.remove('open');
-      document.getElementById('hamburger').classList.remove('open');
-    }
-
-    function setActiveNav(id) {
-      document.querySelectorAll('.drawer-item, .drawer-group-toggle').forEach(b => b.classList.remove('active'));
-      const el = document.getElementById('nav-' + id);
-      if (el) el.classList.add('active');
-    }
-
-    function navTo(section, tab, btn) {
-      closeDrawer();
-
-      if (section === 'home') {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-home').classList.add('active');
-        document.getElementById('header-sub').textContent = 'Aktuálne kola';
-        setActiveNav('home');
-        return;
       }
 
-      if (section === 'h2h') {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-h2h').classList.add('active');
-        document.getElementById('header-sub').textContent = 'H2H';
-        setActiveNav('h2h');
-        return;
+      const tournamentUrl = tdid => `https://n01darts.com/n01/league/season.php?id=${tdid}`;
+      let html = '<div class="round-pair">';
+      if (last) {
+        html += `<a class="round-chip played" href="${tournamentUrl(last.tdid)}" target="_blank" rel="noopener">
+          <div class="round-chip-tag">Posledné kolo</div>
+          <div class="round-chip-title">${last.title}</div>
+          <div class="round-chip-date">${fmtDate(last.updateTime)} →</div>
+        </a>`;
       }
-
-      if (section === 'player') {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-stats').classList.add('active');
-        document.getElementById('header-sub').textContent = 'Hráč · Štatistiky';
-        setActiveNav('player');
-        return;
+      if (next) {
+        html += `<a class="round-chip upcoming" href="${tournamentUrl(next.tdid)}" target="_blank" rel="noopener">
+          <div class="round-chip-tag">Ďalšie kolo</div>
+          <div class="round-chip-title">${next.title}</div>
+          <div class="round-chip-date">Prihlásiť sa →</div>
+        </a>`;
+      } else {
+        html += `<div class="round-chip upcoming">
+          <div class="round-chip-tag">Ďalšie kolo</div>
+          <div class="round-chip-title">Čoskoro</div>
+          <div class="round-chip-date">—</div>
+        </div>`;
       }
-
-      if (section === 'hist-table') {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-hist-table').classList.add('active');
-        document.getElementById('header-sub').textContent = 'Historická tabuľka';
-        setActiveNav('hist-table');
-        return;
-      }
-
-      // Liga pages
-      const url = LIGA_URLS[section][tab];
-      const iframe = document.getElementById('liga-iframe');
-      document.getElementById('iframe-loader').classList.remove('hidden');
-      iframe.src = url;
-      document.getElementById('iframe-fallback-link').href = LIGA_URLS[section].portal;
-      document.getElementById('header-sub').textContent =
-        LIGA_URLS[section].label + ' · ' + TAB_LABELS[tab];
-
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-liga').classList.add('active');
-      setActiveNav(section + '-' + tab);
+      html += '</div>';
+      const rp = card.querySelector('.round-pair');
+      if (rp) rp.outerHTML = html;
+    } catch (e) {
+      console.error('loadOneLeague error:', e);
+      const rp = card.querySelector('.round-pair');
+      if (rp) rp.innerHTML = '<div class="round-chip-loading" style="color:#ff8a8a">Nepodarilo sa načítať</div>';
     }
+  }
 
-    function toggleGroup(id) {
-      const btn = document.getElementById('grp-' + id);
-      const items = document.getElementById('grpitems-' + id);
-      btn.classList.toggle('open');
-      items.classList.toggle('open');
-    }
+  async function loadHomeData() {
+    await Promise.allSettled(HOME_LEAGUES.map(lg => loadOneLeague(lg)));
+  }
 
-    function loadHistSeason(lgid, label) {
-      closeDrawer();
-      const url = 'https://n01darts.com/n01/league/l_stats.html?id=' + lgid + '&tab=rank';
-      const iframe = document.getElementById('liga-iframe');
-      iframe.style.display = 'block';
-      document.getElementById('iframe-fallback').style.display = 'none';
-      document.getElementById('iframe-loader').classList.remove('hidden');
-      iframe.src = url;
-      document.getElementById('iframe-fallback-link').href =
-        'https://n01darts.com/n01/league/portal.php?lgid=' + lgid;
-      document.getElementById('header-sub').textContent = label;
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-liga').classList.add('active');
-      document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
-    }
+  /* ── NAV ── */
+  function toggleDrawer() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const hamburger = document.getElementById('hamburger');
+    const isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('open', !isOpen);
+    hamburger.classList.toggle('open', !isOpen);
+  }
 
-    // Iframe load / error
-    const ligaIframe = document.getElementById('liga-iframe');
-    ligaIframe.addEventListener('load', () => {
-      document.getElementById('iframe-loader').classList.add('hidden');
+  function closeDrawer() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }
+
+  function setActiveNav(navId) {
+    document.querySelectorAll('.nav-group-btn, .nav-sub-item').forEach(b => {
+      b.classList.remove('active-page', 'active');
     });
-    ligaIframe.addEventListener('error', () => {
-      document.getElementById('iframe-loader').classList.add('hidden');
-      ligaIframe.style.display = 'none';
-      document.getElementById('iframe-fallback').style.display = 'block';
-    });
-
-    // Inicializácia — načítaj aktualnesezony.json, potom home dáta
-    initApp();
-
-    // SERVICE WORKER
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
+    const el = document.getElementById('nav-' + navId);
+    if (el) {
+      el.classList.add(el.classList.contains('nav-sub-item') ? 'active' : 'active-page');
     }
-  </script>
+  }
+
+  function setTopbar(section, page) {
+    document.getElementById('topbar-section').textContent = section;
+    const pageEl = document.getElementById('topbar-page');
+    const sepEl = document.getElementById('topbar-sep');
+    if (page) {
+      pageEl.textContent = page;
+      sepEl.style.display = '';
+    } else {
+      pageEl.textContent = '';
+      sepEl.style.display = 'none';
+    }
+  }
+
+  function navTo(section, tab, btn) {
+    closeDrawer();
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+    if (section === 'home') {
+      document.getElementById('page-home').classList.add('active');
+      setTopbar('Domov', null);
+      setActiveNav('home');
+      return;
+    }
+    if (section === 'h2h') {
+      document.getElementById('page-h2h').classList.add('active');
+      setTopbar('Štatistiky', 'H2H – Prvá liga');
+      setActiveNav('h2h');
+      return;
+    }
+    if (section === 'player') {
+      document.getElementById('page-stats').classList.add('active');
+      setTopbar('Štatistiky', 'Hráč');
+      setActiveNav('player');
+      return;
+    }
+    if (section === 'hist-table') {
+      document.getElementById('page-hist-table').classList.add('active');
+      setTopbar('Predošlé sezóny', 'Historická tabuľka');
+      setActiveNav('hist-table');
+      return;
+    }
+
+    // Liga
+    const url = LIGA_URLS[section]?.[tab];
+    if (!url) return;
+    const iframe = document.getElementById('liga-iframe');
+    document.getElementById('iframe-loader').classList.remove('hidden');
+    iframe.src = url;
+    document.getElementById('iframe-fallback-link').href = LIGA_URLS[section].portal;
+    setTopbar(LIGA_URLS[section].label, TAB_LABELS[tab]);
+    document.getElementById('page-liga').classList.add('active');
+    setActiveNav(section + '-' + tab);
+  }
+
+  function toggleGroup(id) {
+    const btn = document.getElementById('grp-' + id);
+    const items = document.getElementById('grpitems-' + id);
+    btn.classList.toggle('open');
+    items.classList.toggle('open');
+  }
+
+  function loadHistSeason(lgid, label) {
+    closeDrawer();
+    const url = 'https://n01darts.com/n01/league/l_stats.html?id=' + lgid + '&tab=rank';
+    const iframe = document.getElementById('liga-iframe');
+    iframe.style.display = 'block';
+    document.getElementById('iframe-fallback').style.display = 'none';
+    document.getElementById('iframe-loader').classList.remove('hidden');
+    iframe.src = url;
+    document.getElementById('iframe-fallback-link').href = 'https://n01darts.com/n01/league/portal.php?lgid=' + lgid;
+    setTopbar('Predošlé sezóny', label);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-liga').classList.add('active');
+    document.querySelectorAll('.nav-sub-item').forEach(b => b.classList.remove('active'));
+  }
+
+  // Iframe events
+  const ligaIframe = document.getElementById('liga-iframe');
+  ligaIframe.addEventListener('load', () => document.getElementById('iframe-loader').classList.add('hidden'));
+  ligaIframe.addEventListener('error', () => {
+    document.getElementById('iframe-loader').classList.add('hidden');
+    ligaIframe.style.display = 'none';
+    document.getElementById('iframe-fallback').style.display = 'block';
+  });
+
+  initApp();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 </body>
 </html>
