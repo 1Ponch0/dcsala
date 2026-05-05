@@ -1,6 +1,16 @@
 // ─── PRVÁ LIGA – OOM STANDINGS ───────────────────────────────────
 
-const PRVA_LIGA_LGID = 'lg_KQ1q_3231';
+let _prvaLigaLgid = null;
+
+async function getPrvaLigaId() {
+  if (_prvaLigaLgid) return _prvaLigaLgid;
+  const res = await fetch('aktualnesezony.json?t=' + Date.now());
+  const cfg = await res.json();
+  const m = cfg.prva?.match(/lgid=(lg_[^&]+)/);
+  if (!m) throw new Error('Prvá liga ID sa nenašlo v aktualnesezony.json');
+  _prvaLigaLgid = m[1];
+  return _prvaLigaLgid;
+}
 
 const OOM_PLACEMENT_PTS = { 1: 34, 2: 26, 3: 18, 4: 18, 5: 10, 6: 10, 7: 10, 8: 10 };
 const OOM_ENTRY_PT  = 2;
@@ -117,8 +127,8 @@ async function oomFetchRound(tdid) {
 }
 
 async function loadPrvaRankData() {
-  const ligisti = await loadPrvoligisti();
-  const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${PRVA_LIGA_LGID}`;
+  const [ligisti, lgid] = await Promise.all([loadPrvoligisti(), getPrvaLigaId()]);
+  const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${lgid}`;
   const listData = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(listUrl), 10000);
   if (!listData) throw new Error('Nepodarilo sa načítať zoznam kôl');
 
