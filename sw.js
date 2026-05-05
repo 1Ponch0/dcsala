@@ -1,10 +1,11 @@
-const CACHE = "dcsala-v3";
+const CACHE = "dcsala-v4";
 const ASSETS = [
   "/dcsala/",
   "/dcsala/index.html",
   "/dcsala/data.js",
   "/dcsala/h2h.js",
   "/dcsala/stats.js",
+  "/dcsala/prva_liga_rank.js",
   "/dcsala/manifest.json"
 ];
 
