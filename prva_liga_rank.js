@@ -11,6 +11,15 @@ const OOM_RR_D = 1;
 const RELEGATION_ZONE = 2; // posledných N hráčov
 
 let _prvaRankDone = false;
+let _prvoligistiKeys = null;
+
+async function loadPrvoligisti() {
+  if (_prvoligistiKeys) return _prvoligistiKeys;
+  const res = await fetch('prvoligisti.json?t=' + Date.now());
+  const names = await res.json();
+  _prvoligistiKeys = new Set(names.map(n => normalizeName(n)));
+  return _prvoligistiKeys;
+}
 
 function oomIterStages(val) {
   if (!val) return [];
@@ -108,6 +117,7 @@ async function oomFetchRound(tdid) {
 }
 
 async function loadPrvaRankData() {
+  const ligisti = await loadPrvoligisti();
   const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${PRVA_LIGA_LGID}`;
   const listData = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(listUrl), 10000);
   if (!listData) throw new Error('Nepodarilo sa načítať zoznam kôl');
@@ -138,6 +148,7 @@ async function loadPrvaRankData() {
         if (!s.name || !s.rounds) continue;
         const displayName = preferredDisplayName(s.name);
         const normKey = normalizeName(displayName);
+        if (!ligisti.has(normKey)) continue;
         if (!allScores.has(normKey)) {
           allScores.set(normKey, {
             name: displayName, pts: 0, rounds: 0,
@@ -160,7 +171,7 @@ async function loadPrvaRankData() {
   }
 
   const players = Array.from(allScores.values())
-    .filter(p => p.rounds >= 2)
+    .filter(p => p.rounds > 0)
     .sort((a, b) => b.pts - a.pts || b.matchesWon - a.matchesWon || (b.legsFor - b.legsAgainst) - (a.legsFor - a.legsAgainst));
 
   return { players, totalRounds: rounds.length, completedRounds };
