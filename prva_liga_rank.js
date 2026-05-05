@@ -160,7 +160,7 @@ async function loadPrvaRankData() {
   }
 
   const players = Array.from(allScores.values())
-    .filter(p => p.rounds > 0)
+    .filter(p => p.rounds >= 2)
     .sort((a, b) => b.pts - a.pts || b.matchesWon - a.matchesWon || (b.legsFor - b.legsAgainst) - (a.legsFor - a.legsAgainst));
 
   return { players, totalRounds: rounds.length, completedRounds };
