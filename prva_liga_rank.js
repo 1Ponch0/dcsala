@@ -1,16 +1,4 @@
-// ─── PRVÁ LIGA – OOM STANDINGS ───────────────────────────────────
-
-let _prvaLigaLgid = null;
-
-async function getPrvaLigaId() {
-  if (_prvaLigaLgid) return _prvaLigaLgid;
-  const res = await fetch('aktualnesezony.json?t=' + Date.now());
-  const cfg = await res.json();
-  const m = cfg.prva?.match(/lgid=(lg_[^&]+)/);
-  if (!m) throw new Error('Prvá liga ID sa nenašlo v aktualnesezony.json');
-  _prvaLigaLgid = m[1];
-  return _prvaLigaLgid;
-}
+// ─── LIGA OOM STANDINGS (Prvá liga + Ženská liga) ────────────────
 
 const OOM_PLACEMENT_PTS = { 1: 34, 2: 26, 3: 18, 4: 18, 5: 10, 6: 10, 7: 10, 8: 10 };
 const OOM_ENTRY_PT  = 2;
@@ -18,18 +6,7 @@ const OOM_KO_WIN_PT = 2;
 const OOM_RR_W = 2;
 const OOM_RR_D = 1;
 
-const RELEGATION_ZONE = 2; // posledných N hráčov
-
-let _prvaRankDone = false;
-let _prvoligistiKeys = null;
-
-async function loadPrvoligisti() {
-  if (_prvoligistiKeys) return _prvoligistiKeys;
-  const res = await fetch('prvoligisti.json?t=' + Date.now());
-  const names = await res.json();
-  _prvoligistiKeys = new Set(names.map(n => normalizeName(n)));
-  return _prvoligistiKeys;
-}
+// ─── SHARED HELPERS ──────────────────────────────────────────────
 
 function oomIterStages(val) {
   if (!val) return [];
@@ -59,7 +36,6 @@ function oomScoreRound(data) {
     return scores.get(tpid);
   }
 
-  // 1. Entry points
   (data.entry_list || []).forEach(p => {
     if (!p.tpid) return;
     const s = get(p.tpid);
@@ -68,7 +44,6 @@ function oomScoreRound(data) {
     s.rounds = 1;
   });
 
-  // 2. Round-robin points + legs
   for (const stage of oomIterStages(data.rr_result)) {
     for (const [pid, opps] of Object.entries(stage || {})) {
       for (const [oid, stats] of Object.entries(opps || {})) {
@@ -86,7 +61,6 @@ function oomScoreRound(data) {
     }
   }
 
-  // 3. KO win points + legs
   for (const stage of oomIterStages(data.t_result)) {
     for (const [pid, opps] of Object.entries(stage || {})) {
       for (const [oid, stats] of Object.entries(opps || {})) {
@@ -103,7 +77,6 @@ function oomScoreRound(data) {
     }
   }
 
-  // 4. Placement bonus
   const tTable = data.t_table;
   if (tTable && tTable.length >= 2) {
     for (const [tpid, s] of scores) {
@@ -126,8 +99,8 @@ async function oomFetchRound(tdid) {
   return fetchWithTimeout(CORS_PROXY + encodeURIComponent(url), 10000);
 }
 
-async function loadPrvaRankData() {
-  const [ligisti, lgid] = await Promise.all([loadPrvoligisti(), getPrvaLigaId()]);
+// whitelist = Set of normKeys, null = všetci hráči
+async function loadLigaRankData(lgid, whitelist) {
   const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${lgid}`;
   const listData = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(listUrl), 10000);
   if (!listData) throw new Error('Nepodarilo sa načítať zoznam kôl');
@@ -158,7 +131,7 @@ async function loadPrvaRankData() {
         if (!s.name || !s.rounds) continue;
         const displayName = preferredDisplayName(s.name);
         const normKey = normalizeName(displayName);
-        if (!ligisti.has(normKey)) continue;
+        if (whitelist && !whitelist.has(normKey)) continue;
         if (!allScores.has(normKey)) {
           allScores.set(normKey, {
             name: displayName, pts: 0, rounds: 0,
@@ -167,15 +140,15 @@ async function loadPrvaRankData() {
           });
         }
         const agg = allScores.get(normKey);
-        agg.pts          += s.pts;
-        agg.rounds       += s.rounds;
-        agg.matchesWon   += s.matchesWon;
-        agg.legsFor      += s.legsFor;
-        agg.legsAgainst  += s.legsAgainst;
-        agg.p1           += s.p1;
-        agg.p2           += s.p2;
-        agg.p3           += s.p3;
-        agg.p5           += s.p5;
+        agg.pts         += s.pts;
+        agg.rounds      += s.rounds;
+        agg.matchesWon  += s.matchesWon;
+        agg.legsFor     += s.legsFor;
+        agg.legsAgainst += s.legsAgainst;
+        agg.p1          += s.p1;
+        agg.p2          += s.p2;
+        agg.p3          += s.p3;
+        agg.p5          += s.p5;
       }
     });
   }
@@ -187,21 +160,20 @@ async function loadPrvaRankData() {
   return { players, totalRounds: rounds.length, completedRounds };
 }
 
+// ─── ROW RENDERING ───────────────────────────────────────────────
+
 const TROPHY_ICONS = [
-  /* 1st – gold trophy */
   `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6 3h12v8a6 6 0 0 1-12 0V3z"/>
     <path d="M4 3H2v4a4 4 0 0 0 4 4M20 3h2v4a4 4 0 0 1-4 4"/>
     <line x1="12" y1="17" x2="12" y2="21"/>
     <path d="M8 21h8"/>
   </svg>`,
-  /* 2nd – silver medal */
   `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="10" r="6"/>
     <path d="M8 22h8M12 16v6"/>
     <circle cx="12" cy="10" r="3" fill="rgba(148,163,184,0.15)"/>
   </svg>`,
-  /* 3rd – bronze medal */
   `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#cd7c40" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="10" r="6"/>
     <path d="M8 22h8M12 16v6"/>
@@ -209,8 +181,8 @@ const TROPHY_ICONS = [
   </svg>`
 ];
 
-function renderRankRow(p, i, total) {
-  const isRelegate = i >= total - RELEGATION_ZONE;
+function renderRankRow(p, i, total, relegationZone) {
+  const isRelegate = relegationZone > 0 && i >= total - relegationZone;
   const legDiff = p.legsFor - p.legsAgainst;
   const legDiffStr = legDiff >= 0 ? `+${legDiff}` : `${legDiff}`;
 
@@ -224,7 +196,7 @@ function renderRankRow(p, i, total) {
     ? `<td class="rnk-pos">${TROPHY_ICONS[i]}</td>`
     : `<td class="rnk-pos">${i + 1}</td>`;
 
-  const separator = (i === total - RELEGATION_ZONE)
+  const separator = (relegationZone > 0 && i === total - relegationZone)
     ? `<tr class="relegate-separator"><td colspan="7"><span>ZOSTUP</span></td></tr>`
     : '';
 
@@ -239,25 +211,99 @@ function renderRankRow(p, i, total) {
   </tr>`;
 }
 
+function renderRankTable(players, relegationZone, bodyId, metaId, loadingId, contentId, errorId) {
+  return async function() {
+    try {
+      document.getElementById(metaId).innerHTML = `
+        <span class="pill">${players.completedRounds} / ${players.totalRounds} kôl</span>
+        <span class="pill">${players.players.length} hráčov</span>
+      `;
+      document.getElementById(bodyId).innerHTML =
+        players.players.map((p, i) => renderRankRow(p, i, players.players.length, relegationZone)).join('');
+      document.getElementById(loadingId).style.display = 'none';
+      document.getElementById(contentId).style.display = 'block';
+    } catch (err) {
+      document.getElementById(loadingId).style.display = 'none';
+      document.getElementById(errorId).textContent = 'Nepodarilo sa načítať dáta: ' + err.message;
+    }
+  };
+}
+
+// ─── PRVÁ LIGA ───────────────────────────────────────────────────
+
+let _prvaRankDone = false;
+let _prvaLigaLgid = null;
+let _prvoligistiKeys = null;
+
+async function getPrvaLigaId() {
+  if (_prvaLigaLgid) return _prvaLigaLgid;
+  const res = await fetch('aktualnesezony.json?t=' + Date.now());
+  const cfg = await res.json();
+  const m = cfg.prva?.match(/lgid=(lg_[^&]+)/);
+  if (!m) throw new Error('Prvá liga ID sa nenašlo v aktualnesezony.json');
+  _prvaLigaLgid = m[1];
+  return _prvaLigaLgid;
+}
+
+async function loadPrvoligisti() {
+  if (_prvoligistiKeys) return _prvoligistiKeys;
+  const res = await fetch('prvoligisti.json?t=' + Date.now());
+  const names = await res.json();
+  _prvoligistiKeys = new Set(names.map(n => normalizeName(n)));
+  return _prvoligistiKeys;
+}
+
 async function initPrvaRank() {
   if (_prvaRankDone) return;
   _prvaRankDone = true;
-
   try {
-    const { players, totalRounds, completedRounds } = await loadPrvaRankData();
-
+    const [lgid, whitelist] = await Promise.all([getPrvaLigaId(), loadPrvoligisti()]);
+    const data = await loadLigaRankData(lgid, whitelist);
     document.getElementById('prvrank-meta').innerHTML = `
-      <span class="pill">${completedRounds} / ${totalRounds} kôl</span>
-      <span class="pill">${players.length} hráčov</span>
+      <span class="pill">${data.completedRounds} / ${data.totalRounds} kôl</span>
+      <span class="pill">${data.players.length} hráčov</span>
     `;
-
     document.getElementById('prvrank-body').innerHTML =
-      players.map((p, i) => renderRankRow(p, i, players.length)).join('');
-
+      data.players.map((p, i) => renderRankRow(p, i, data.players.length, 2)).join('');
     document.getElementById('prvrank-loading').style.display = 'none';
     document.getElementById('prvrank-content').style.display = 'block';
   } catch (err) {
     document.getElementById('prvrank-loading').style.display = 'none';
     document.getElementById('prvrank-error').textContent = 'Nepodarilo sa načítať dáta: ' + err.message;
+  }
+}
+
+// ─── ŽENSKÁ LIGA ─────────────────────────────────────────────────
+
+let _zenskaRankDone = false;
+let _zenskaLigaLgid = null;
+
+async function getZenskaLigaId() {
+  if (_zenskaLigaLgid) return _zenskaLigaLgid;
+  const res = await fetch('aktualnesezony.json?t=' + Date.now());
+  const cfg = await res.json();
+  const m = cfg.zenska?.match(/lgid=(lg_[^&]+)/);
+  if (!m) throw new Error('Ženská liga ID sa nenašlo v aktualnesezony.json');
+  _zenskaLigaLgid = m[1];
+  return _zenskaLigaLgid;
+}
+
+async function initZenskaRank() {
+  if (_zenskaRankDone) return;
+  _zenskaRankDone = true;
+  try {
+    const lgid = await getZenskaLigaId();
+    const data = await loadLigaRankData(lgid, null); // null = všetky hráčky
+    document.getElementById('zenrank-meta').innerHTML = `
+      <span class="pill">${data.completedRounds} / ${data.totalRounds} kôl</span>
+      <span class="pill">${data.players.length} hráčok</span>
+    `;
+    document.getElementById('zenrank-body').innerHTML =
+      data.players.map((p, i) => renderRankRow(p, i, data.players.length, 0)).join('');
+    document.getElementById('zenrank-loading').style.display = 'none';
+    document.getElementById('zenrank-content').style.display = 'block';
+  } catch (err) {
+    document.getElementById('zenrank-loading').style.display = 'none';
+    document.getElementById('zenrank-error').textContent = 'Nepodarilo sa načítať dáta: ' + err.message;
   }
 }

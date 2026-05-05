@@ -1686,6 +1686,37 @@
     <div id="prvrank-error" class="error"></div>
   </div>
 
+  <!-- ŽENSKÁ LIGA OOM RANK -->
+  <div id="page-zenska-rank" class="page content">
+    <div class="page-header">
+      <div class="page-eyebrow">Ženská liga · Sezóna 16</div>
+      <div class="page-title">Tabuľka <span>OOM</span></div>
+    </div>
+    <div id="zenrank-loading" class="loading"><div class="spinner"></div><div>Načítavam výsledky...</div></div>
+    <div id="zenrank-content" style="display:none">
+      <div id="zenrank-meta" class="pill-row" style="margin-bottom:16px"></div>
+      <div class="rnk-card">
+        <div class="rnk-wrap">
+          <table class="rnk-table">
+            <thead>
+              <tr>
+                <th class="rnk-th-pos">#</th>
+                <th class="rnk-th-name">Hráčka</th>
+                <th class="rnk-th-num">Vyhraté kolá</th>
+                <th class="rnk-th-num">Vyhraté zápasy</th>
+                <th class="rnk-th-num">Leg differenc</th>
+                <th class="rnk-th-num">Vyhraté legy</th>
+                <th class="rnk-th-pts">Body</th>
+              </tr>
+            </thead>
+            <tbody id="zenrank-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="zenrank-error" class="error"></div>
+  </div>
+
   <!-- PLAYER STATS -->
   <div id="page-stats" class="page content">
     <div class="page-header">
@@ -1976,6 +2007,13 @@
       setTopbar('Prvá liga', 'Tabuľka');
       setActiveNav('prva-rank');
       initPrvaRank();
+      return;
+    }
+    if (section === 'zenska' && tab === 'rank') {
+      document.getElementById('page-zenska-rank').classList.add('active');
+      setTopbar('Ženská liga', 'Tabuľka');
+      setActiveNav('zenska-rank');
+      initZenskaRank();
       return;
     }
 
