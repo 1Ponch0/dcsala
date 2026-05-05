@@ -177,23 +177,49 @@ async function loadPrvaRankData() {
   return { players, totalRounds: rounds.length, completedRounds };
 }
 
+const TROPHY_ICONS = [
+  /* 1st – gold trophy */
+  `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#f59e0b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 3h12v8a6 6 0 0 1-12 0V3z"/>
+    <path d="M4 3H2v4a4 4 0 0 0 4 4M20 3h2v4a4 4 0 0 1-4 4"/>
+    <line x1="12" y1="17" x2="12" y2="21"/>
+    <path d="M8 21h8"/>
+  </svg>`,
+  /* 2nd – silver medal */
+  `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#94a3b8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="10" r="6"/>
+    <path d="M8 22h8M12 16v6"/>
+    <circle cx="12" cy="10" r="3" fill="rgba(148,163,184,0.15)"/>
+  </svg>`,
+  /* 3rd – bronze medal */
+  `<svg viewBox="0 0 24 24" class="rnk-trophy" fill="none" stroke="#cd7c40" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="10" r="6"/>
+    <path d="M8 22h8M12 16v6"/>
+    <circle cx="12" cy="10" r="3" fill="rgba(205,124,64,0.15)"/>
+  </svg>`
+];
+
 function renderRankRow(p, i, total) {
   const isRelegate = i >= total - RELEGATION_ZONE;
   const legDiff = p.legsFor - p.legsAgainst;
   const legDiffStr = legDiff >= 0 ? `+${legDiff}` : `${legDiff}`;
 
   let rowCls = '';
-  if (i === 0)        rowCls = 'rank-gold';
-  else if (i === 1)   rowCls = 'rank-silver';
-  else if (i === 2)   rowCls = 'rank-bronze';
+  if (i === 0)         rowCls = 'rank-gold';
+  else if (i === 1)    rowCls = 'rank-silver';
+  else if (i === 2)    rowCls = 'rank-bronze';
   else if (isRelegate) rowCls = 'rank-relegate';
+
+  const posCell = i < 3
+    ? `<td class="rnk-pos">${TROPHY_ICONS[i]}</td>`
+    : `<td class="rnk-pos">${i + 1}</td>`;
 
   const separator = (i === total - RELEGATION_ZONE)
     ? `<tr class="relegate-separator"><td colspan="7"><span>ZOSTUP</span></td></tr>`
     : '';
 
   return `${separator}<tr class="${rowCls}">
-    <td class="rnk-pos">${i + 1}</td>
+    ${posCell}
     <td class="rnk-name">${p.name}</td>
     <td class="rnk-num">${p.p1}</td>
     <td class="rnk-num">${p.matchesWon}</td>
