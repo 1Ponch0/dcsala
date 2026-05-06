@@ -26,7 +26,7 @@ function oomGetPlacement(tpid, tTable) {
   return null;
 }
 
-function oomScoreRound(data, placementPts) {
+function oomScoreRound(data, placementPts, koWinPt = OOM_KO_WIN_PT) {
   const scores = new Map();
   function get(tpid) {
     if (!scores.has(tpid)) scores.set(tpid, {
@@ -72,8 +72,8 @@ function oomScoreRound(data, placementPts) {
         get(pid).legsAgainst += rB;
         get(oid).legsFor     += rB;
         get(oid).legsAgainst += rA;
-        if (rA > rB)      { get(pid).pts += OOM_KO_WIN_PT; get(pid).matchesWon++; }
-        else if (rB > rA) { get(oid).pts += OOM_KO_WIN_PT; get(oid).matchesWon++; }
+        if (rA > rB)      { get(pid).pts += koWinPt; get(pid).matchesWon++; }
+        else if (rB > rA) { get(oid).pts += koWinPt; get(oid).matchesWon++; }
       }
     }
   }
@@ -101,7 +101,8 @@ async function oomFetchRound(tdid) {
 }
 
 // whitelist = Set of normKeys, null = všetci hráči
-async function loadLigaRankData(lgid, whitelist, placementPts) {
+// koWinPt = body za výhru v KO (0 pre ženskú ligu)
+async function loadLigaRankData(lgid, whitelist, placementPts, koWinPt = OOM_KO_WIN_PT) {
   const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${lgid}`;
   const listData = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(listUrl), 10000);
   if (!listData) throw new Error('Nepodarilo sa načítať zoznam kôl');
@@ -126,7 +127,7 @@ async function loadLigaRankData(lgid, whitelist, placementPts) {
     results.forEach(res => {
       if (res.status !== 'fulfilled' || !res.value) return;
       completedRounds++;
-      const roundScores = oomScoreRound(res.value, placementPts);
+      const roundScores = oomScoreRound(res.value, placementPts, koWinPt);
 
       for (const [, s] of roundScores) {
         if (!s.name || !s.rounds) continue;
@@ -296,7 +297,7 @@ async function initZenskaRank() {
   _zenskaRankDone = true;
   try {
     const lgid = await getZenskaLigaId();
-    const data = await loadLigaRankData(lgid, null, OOM_PLACEMENT_ZENSKA);
+    const data = await loadLigaRankData(lgid, null, OOM_PLACEMENT_ZENSKA, 0);
     document.getElementById('zenrank-meta').innerHTML = `
       <span class="pill">${data.completedRounds} / ${data.totalRounds} kôl</span>
       <span class="pill">${data.players.length} hráčok</span>
