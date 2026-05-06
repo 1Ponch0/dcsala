@@ -239,7 +239,8 @@ async function getPrvaLigaId() {
   if (_prvaLigaLgid) return _prvaLigaLgid;
   const res = await fetch('aktualnesezony.json?t=' + Date.now());
   const cfg = await res.json();
-  const m = cfg.prva?.match(/lgid=(lg_[^&]+)/);
+  const url = cfg.prva || cfg._prva;
+  const m = url?.match(/lgid=(lg_[^&]+)/);
   if (!m) throw new Error('Prvá liga ID sa nenašlo v aktualnesezony.json');
   _prvaLigaLgid = m[1];
   return _prvaLigaLgid;
@@ -282,7 +283,8 @@ async function getZenskaLigaId() {
   if (_zenskaLigaLgid) return _zenskaLigaLgid;
   const res = await fetch('aktualnesezony.json?t=' + Date.now());
   const cfg = await res.json();
-  const m = cfg.zenska?.match(/lgid=(lg_[^&]+)/);
+  const url = cfg.zenska || cfg._zenska;
+  const m = url?.match(/lgid=(lg_[^&]+)/);
   if (!m) throw new Error('Ženská liga ID sa nenašlo v aktualnesezony.json');
   _zenskaLigaLgid = m[1];
   return _zenskaLigaLgid;
