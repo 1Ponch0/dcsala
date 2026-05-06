@@ -1,6 +1,7 @@
 // ─── LIGA OOM STANDINGS (Prvá liga + Ženská liga) ────────────────
 
-const OOM_PLACEMENT_PTS = { 1: 34, 2: 26, 3: 18, 4: 18, 5: 10, 6: 10, 7: 10, 8: 10 };
+const OOM_PLACEMENT_PRVA  = { 1: 34, 2: 26, 3: 18, 4: 18, 5: 10, 6: 10, 7: 10, 8: 10 };
+const OOM_PLACEMENT_ZENSKA = { 1: 26, 2: 18, 3: 10, 4: 10 };
 const OOM_ENTRY_PT  = 2;
 const OOM_KO_WIN_PT = 2;
 const OOM_RR_W = 2;
@@ -25,7 +26,7 @@ function oomGetPlacement(tpid, tTable) {
   return null;
 }
 
-function oomScoreRound(data) {
+function oomScoreRound(data, placementPts) {
   const scores = new Map();
   function get(tpid) {
     if (!scores.has(tpid)) scores.set(tpid, {
@@ -82,7 +83,7 @@ function oomScoreRound(data) {
     for (const [tpid, s] of scores) {
       const pl = oomGetPlacement(tpid, tTable);
       if (pl !== null) {
-        s.pts += OOM_PLACEMENT_PTS[pl] || 0;
+        s.pts += placementPts[pl] || 0;
         if (pl === 1)      s.p1++;
         else if (pl === 2) s.p2++;
         else if (pl === 3) s.p3++;
@@ -100,7 +101,7 @@ async function oomFetchRound(tdid) {
 }
 
 // whitelist = Set of normKeys, null = všetci hráči
-async function loadLigaRankData(lgid, whitelist) {
+async function loadLigaRankData(lgid, whitelist, placementPts) {
   const listUrl = `https://tk2-228-23746.vs.sakura.ne.jp/n01/league/n01_stats_l.php?cmd=t_list&lgid=${lgid}`;
   const listData = await fetchWithTimeout(CORS_PROXY + encodeURIComponent(listUrl), 10000);
   if (!listData) throw new Error('Nepodarilo sa načítať zoznam kôl');
@@ -125,7 +126,7 @@ async function loadLigaRankData(lgid, whitelist) {
     results.forEach(res => {
       if (res.status !== 'fulfilled' || !res.value) return;
       completedRounds++;
-      const roundScores = oomScoreRound(res.value);
+      const roundScores = oomScoreRound(res.value, placementPts);
 
       for (const [, s] of roundScores) {
         if (!s.name || !s.rounds) continue;
@@ -259,7 +260,7 @@ async function initPrvaRank() {
   _prvaRankDone = true;
   try {
     const [lgid, whitelist] = await Promise.all([getPrvaLigaId(), loadPrvoligisti()]);
-    const data = await loadLigaRankData(lgid, whitelist);
+    const data = await loadLigaRankData(lgid, whitelist, OOM_PLACEMENT_PRVA);
     document.getElementById('prvrank-meta').innerHTML = `
       <span class="pill">${data.completedRounds} / ${data.totalRounds} kôl</span>
       <span class="pill">${data.players.length} hráčov</span>
@@ -295,7 +296,7 @@ async function initZenskaRank() {
   _zenskaRankDone = true;
   try {
     const lgid = await getZenskaLigaId();
-    const data = await loadLigaRankData(lgid, null); // null = všetky hráčky
+    const data = await loadLigaRankData(lgid, null, OOM_PLACEMENT_ZENSKA);
     document.getElementById('zenrank-meta').innerHTML = `
       <span class="pill">${data.completedRounds} / ${data.totalRounds} kôl</span>
       <span class="pill">${data.players.length} hráčok</span>
