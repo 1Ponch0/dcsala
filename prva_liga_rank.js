@@ -1,7 +1,7 @@
 // ─── LIGA OOM STANDINGS (Prvá liga + Ženská liga) ────────────────
 
 const OOM_PLACEMENT_PRVA  = { 1: 34, 2: 26, 3: 18, 4: 18, 5: 10, 6: 10, 7: 10, 8: 10 };
-const OOM_PLACEMENT_ZENSKA = { 1: 26, 2: 18, 3: 10, 4: 10 };
+const OOM_PLACEMENT_ZENSKA = { 1: 30, 2: 20, 3: 10, 4: 10 };
 const OOM_ENTRY_PT  = 2;
 const OOM_KO_WIN_PT = 2;
 const OOM_RR_W = 2;
