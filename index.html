@@ -1851,6 +1851,15 @@
       HOME_LEAGUES = Object.entries(cfg).map(([key, url]) => ({
         key, id: lgidFromUrl(url), label: LEAGUE_META[key]?.label || key
       }));
+      // Skry nav položky pre ligy ktoré nie sú v aktualnesezony.json
+      ['prva', 'open', 'letna', 'zenska'].forEach(key => {
+        if (!LIGA_URLS[key]) {
+          const grp = document.getElementById('grp-' + key);
+          const items = document.getElementById('grpitems-' + key);
+          if (grp) grp.style.display = 'none';
+          if (items) items.style.display = 'none';
+        }
+      });
     } catch (e) { console.warn('aktualnesezony.json failed', e); }
     try {
       const res = await fetch('predoslesezony.json?t=' + Date.now());
