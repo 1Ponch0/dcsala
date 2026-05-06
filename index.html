@@ -499,6 +499,18 @@
     /* ── Page Header ── */
     .page-header {
       margin-bottom: 28px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .page-header-text { flex: 1; }
+    .page-header-logo {
+      width: 72px; height: 72px;
+      object-fit: contain;
+      opacity: 0.85;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 12px rgba(124,90,246,0.4));
     }
     .page-eyebrow {
       font-size: 9px;
@@ -1491,8 +1503,11 @@
   <!-- HOME -->
   <div id="page-home" class="page active content">
     <div class="page-header">
-      <div class="page-eyebrow">Prehľad</div>
-      <div class="page-title">Aktuálne <span>kola</span></div>
+      <div class="page-header-text">
+        <div class="page-eyebrow">Prehľad</div>
+        <div class="page-title">Aktuálne <span>kola</span></div>
+      </div>
+      <img src="loga/atlatszo logo kicsi.png" class="page-header-logo" alt="">
     </div>
     <div class="home-grid">
       <div class="league-card" id="home-card-letna">
@@ -1561,8 +1576,11 @@
   <!-- H2H -->
   <div id="page-h2h" class="page content">
     <div class="page-header">
-      <div class="page-eyebrow">Štatistiky</div>
-      <div class="page-title">Head <span>to Head</span></div>
+      <div class="page-header-text">
+        <div class="page-eyebrow">Štatistiky</div>
+        <div class="page-title">Head <span>to Head</span></div>
+      </div>
+      <img src="loga/atlatszo logo kicsi.png" class="page-header-logo" alt="">
     </div>
     <div id="h2h-loading" class="loading"><div class="spinner"></div><div>Načítavam dáta...</div></div>
     <div id="h2h-content" style="display:none">
@@ -1658,8 +1676,11 @@
   <!-- PRVÁ LIGA OOM RANK -->
   <div id="page-prva-rank" class="page content">
     <div class="page-header">
-      <div class="page-eyebrow">Prvá liga · Sezóna 16</div>
-      <div class="page-title">Tabuľka <span>OOM</span></div>
+      <div class="page-header-text">
+        <div class="page-eyebrow">Prvá liga · Sezóna 16</div>
+        <div class="page-title">Tabuľka <span>OOM</span></div>
+      </div>
+      <img src="loga/atlatszo logo kicsi.png" class="page-header-logo" alt="">
     </div>
     <div id="prvrank-loading" class="loading"><div class="spinner"></div><div>Načítavam výsledky...</div></div>
     <div id="prvrank-content" style="display:none">
@@ -1689,8 +1710,11 @@
   <!-- ŽENSKÁ LIGA OOM RANK -->
   <div id="page-zenska-rank" class="page content">
     <div class="page-header">
-      <div class="page-eyebrow">Ženská liga · Sezóna 16</div>
-      <div class="page-title">Tabuľka <span>OOM</span></div>
+      <div class="page-header-text">
+        <div class="page-eyebrow">Ženská liga · Sezóna 16</div>
+        <div class="page-title">Tabuľka <span>OOM</span></div>
+      </div>
+      <img src="loga/atlatszo logo kicsi.png" class="page-header-logo" alt="">
     </div>
     <div id="zenrank-loading" class="loading"><div class="spinner"></div><div>Načítavam výsledky...</div></div>
     <div id="zenrank-content" style="display:none">
@@ -1720,8 +1744,11 @@
   <!-- PLAYER STATS -->
   <div id="page-stats" class="page content">
     <div class="page-header">
-      <div class="page-eyebrow">Štatistiky</div>
-      <div class="page-title">Hráč <span>·</span> Profil</div>
+      <div class="page-header-text">
+        <div class="page-eyebrow">Štatistiky</div>
+        <div class="page-title">Hráč <span>·</span> Profil</div>
+      </div>
+      <img src="loga/atlatszo logo kicsi.png" class="page-header-logo" alt="">
     </div>
     <div id="stats-loading" class="loading"><div class="spinner"></div><div>Načítavam dáta...</div></div>
     <div id="stats-content" style="display:none">
